@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.0)
 
+# create project
+project (lindeLib)
 
-if(NOT CMAKE_DEBUG_POSTFIX)
+if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   set(CMAKE_DEBUG_POSTFIX d)
 endif()
 
@@ -11,9 +13,6 @@ endif()
 
 # if it is a debug build
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG_BUILD")
-
-# create project
-project (lindeLib)
 
 # add my headers to project
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/ShaderStorageBuffer.h)
@@ -106,9 +105,9 @@ else()
 endif()
 
 # OpenCV
-find_package(OpenCV REQUIRED)	
+find_package(OpenCV REQUIRED core imgcodecs imgproc)
 message(STATUS "OpenCV libs:\t${OpenCV_LIBS}")
-message(STATUS "OpenCV include dir:\t${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV version:\t${OpenCV_VERSION}")
 
 # GLM
 find_package(GLM REQUIRED)
@@ -132,6 +131,8 @@ endif()
 # Find the Qt5Core library
 #find_package(Qt5Core 5.4 REQUIRED)
 #find_package(Qt5Network 5.4 REQUIRED)
+
+
 
 include_directories(
 		${CMAKE_CURRENT_LIST_DIR}/include/

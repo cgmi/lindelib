@@ -4,6 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include <stack>
 #include <set>
+#include <map>
 
 // https://github.com/qiankanglai/opencv.meanshift
 namespace MeanShiftHelpers

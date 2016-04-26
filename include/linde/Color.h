@@ -133,6 +133,10 @@ float color_difference_CIEDE2000(const glm::vec3 & lab0, const glm::vec3 & lab1)
 *   0 if colors are maximal visual different
 * */
 float ColorSimilarity(const glm::vec3 & lab0, const glm::vec3 &lab1);
+/**
+*   1 if colors are maximal visual different
+ *  0 if colors are identical
+* */
 float ColorDifference(const glm::vec3 & lab0, const glm::vec3 &lab1);
 
 //Baxter, W., Wendt, J., & Lin, M. (2004).

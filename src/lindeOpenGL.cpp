@@ -3,14 +3,13 @@
 namespace linde
 {
 // http://blog.nobel-joergensen.com/2013/02/17/debugging-opengl-part-2-using-gldebugmessagecallback/
-void  APIENTRY openGlDebugCallback(
-        GLenum source,
+void  APIENTRY openGlDebugCallback(GLenum source,
         GLenum type,
         GLuint id,
         GLenum severity,
         GLsizei length,
         const GLchar* message,
-        void* userParam)
+        const void *userParam)
 {
 
     std::cerr << "---------------------opengl-callback-start------------" << std::endl;

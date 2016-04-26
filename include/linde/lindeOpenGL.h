@@ -40,7 +40,7 @@ void  APIENTRY openGlDebugCallback(
         GLenum severity,
         GLsizei length,
         const GLchar* message,
-        void* userParam);
+        const void* userParam);
 
 } // namespace linde
 
