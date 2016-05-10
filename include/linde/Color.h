@@ -170,9 +170,12 @@ public:
     // with errata from http://gamma.cs.unc.edu/IMPASTO/#links
     void computeRT(glm::vec3 & R, glm::vec3 & T, const float d) const;
 
-    static inline void composeDry(const glm::vec3 & R0, const glm::vec3 & T0,
+    static void composeDry(const glm::vec3 & R0, const glm::vec3 & T0,
                                   const glm::vec3 & R1, const glm::vec3 & T1,
                                   glm::vec3 & R, glm::vec3 & T);
+    static void composeDry(const glm::vec3 & R0,
+                                  const glm::vec3 & R1, const glm::vec3 & T1,
+                                  glm::vec3 & R);
 
 
     // Curtis, C. J., Anderson, S. E., Seims, J. E., Fleischer, K. W., & Salesin, D. H. (1997).
@@ -248,6 +251,8 @@ inline  KMColor operator+ ( const KMColor& c, const KMColor& v)
 class Paint
 {
     KMColor     m_color;
+    glm::vec3   R;
+    glm::vec3   T;
 
     float       m_thickness; // thickness of paint
 
@@ -261,16 +266,20 @@ public:
 
     void computeReflectanceAndTransmittance(glm::vec3 & R, glm::vec3 & T) const;
 
+    float   getThickness() const;
+    void    setThickness(float thickness);
 
-    float getOpacity() const;
-    void setOpacity(float thickness);
+    void composeDry(const glm::vec3 & R0, glm::vec3 &Rnew) const;
 
     Paint& operator= ( const Paint& v)
     {
         m_color = v.m_color;
+        R = v.R;
+        T = v.T;
         m_thickness = v.m_thickness;
         return *this;
     }
+
 };
 
 

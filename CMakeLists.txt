@@ -8,7 +8,7 @@ if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
 endif()
 
 if(UNIX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=c++14 -Wall -Werror -Wno-unused-value")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -std=c++14 -Wall -Werror -Wno-unused-value -Wno-unused-variable -Wno-unused-but-set-variable")
 endif()
 
 # if it is a debug build

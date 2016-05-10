@@ -734,10 +734,17 @@ void KMColor::computeRT(glm::vec3 & R, glm::vec3 & T, const float d) const
     //    }
 }
 
-inline void KMColor::composeDry(const glm::vec3 &R0, const glm::vec3 &T0, const glm::vec3 &R1, const glm::vec3 &T1, glm::vec3 &R, glm::vec3 &T)
+void KMColor::composeDry(const glm::vec3 &R0, const glm::vec3 &T0, const glm::vec3 &R1, const glm::vec3 &T1, glm::vec3 &R, glm::vec3 &T)
 {
     R = R1 + (T1*T1*R0) / (1.f - R1*R0);
     T = (T1*T0) / (1.f - R1*R0);
+}
+
+void KMColor::composeDry(const glm::vec3 & R0,
+                              const glm::vec3 & R1, const glm::vec3 & T1,
+                              glm::vec3 & R)
+{
+    R = R1 + (T1*T1*R0) / (1.f - R1*R0);
 }
 
 void KMColor::from_Rb_Rw(const glm::vec3 & Rb_, const glm::vec3 & Rw_, KMColor & kmColor)
@@ -772,8 +779,9 @@ Paint::Paint(const linde::KMColor &color, float thickness) :
     m_color(color),
     m_thickness(thickness)
 {
-
+    computeReflectanceAndTransmittance(R, T);
 }
+
 
 Paint::Paint() :
     m_color(),
@@ -794,6 +802,7 @@ const KMColor & Paint::getColor() const
 void Paint::setColor(const KMColor &color)
 {
     m_color = color;
+    computeReflectanceAndTransmittance(R, T);
 }
 
 void Paint::computeReflectanceAndTransmittance(glm::vec3 &R, glm::vec3 &T) const
@@ -801,14 +810,21 @@ void Paint::computeReflectanceAndTransmittance(glm::vec3 &R, glm::vec3 &T) const
     m_color.computeRT(R, T, m_thickness);
 }
 
-float Paint::getOpacity() const
+
+float Paint::getThickness() const
 {
     return m_thickness;
 }
 
-void Paint::setOpacity(float thickness)
+void Paint::setThickness(float thickness)
 {
     m_thickness = thickness;
+    computeReflectanceAndTransmittance(R, T);
+}
+
+void Paint::composeDry(const glm::vec3 &R0, glm::vec3 & Rnew) const
+{
+    KMColor::composeDry(R0, R, T, Rnew);
 }
 
 
