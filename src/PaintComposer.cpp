@@ -131,11 +131,11 @@ void PaintComposer::serialize(std::ostream &ostream) const
         ostream << c.S.b << ",";
         if (i == m_palette.size()-1)
         {
-            ostream << m_palette[i].getOpacity();
+            ostream << m_palette[i].getThickness();
         }
         else
         {
-            ostream << m_palette[i].getOpacity() << std::endl;
+            ostream << m_palette[i].getThickness() << std::endl;
         }
     }
 }
