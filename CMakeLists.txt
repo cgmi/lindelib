@@ -105,6 +105,9 @@ else()
 endif()
 
 # OpenCV
+if(EXISTS "$ENV{OpenCV3_DIR}")
+set(OpenCV_DIR $ENV{OpenCV3_DIR})
+endif(EXISTS "$ENV{OpenCV3_DIR}")
 find_package(OpenCV REQUIRED core imgcodecs imgproc)
 message(STATUS "OpenCV libs:\t${OpenCV_LIBS}")
 message(STATUS "OpenCV version:\t${OpenCV_VERSION}")
