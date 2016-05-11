@@ -581,7 +581,7 @@ int ConnectedComponents(const cv::Mat_<uchar> &binary, cv::Mat_<int> & labels)
     }
 
     // clear left over boundaries
-    std::function<bool(const cv::Mat_<int> & labels)> boundaryLeft = [](const cv::Mat_<int> & labels)
+    std::function<bool(const cv::Mat_<int> & labels)> boundaryLeft = [&](const cv::Mat_<int> & labels)
     {
         for (uint i = 0; i < labels.total(); i++)
         {
