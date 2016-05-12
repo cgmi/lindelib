@@ -113,10 +113,11 @@ message(STATUS "OpenCV libs:\t${OpenCV_LIBS}")
 message(STATUS "OpenCV version:\t${OpenCV_VERSION}")
 
 # GLM
-find_package(glm REQUIRED)
+find_package(glm QUIET)
 if(NOT GLM_FOUND)
-find_package(GLM REQUIRED)
-endif(GLM_FOUND)
+    message(STATUS "Haven't found glm, trying GLM")
+    find_package(GLM REQUIRED)
+endif(NOT GLM_FOUND)
 
 # libTIFF
 find_package(TIFF)
