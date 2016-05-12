@@ -80,6 +80,11 @@ const std::shared_ptr<Texture> & FrameBufferObject::getTarget() const
     return m_target;
 }
 
+const std::shared_ptr<Texture> & FrameBufferObject::getDepth() const
+{
+	return m_depth;
+}
+
 
 GLboolean FrameBufferObject::checkStatus()
 {

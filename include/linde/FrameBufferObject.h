@@ -54,6 +54,7 @@ public:
     GLvoid attachDepth(GLuint width, GLuint height);
 
     const std::shared_ptr<Texture> &getTarget() const;
+	const std::shared_ptr<Texture> &getDepth() const;
 };
 
 } // namespace linde

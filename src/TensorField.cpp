@@ -985,6 +985,9 @@ StructureTensorField StructureTensorField::createFixedStructureTensorField(const
     StructureTensorField tf;
 
     tf.m_tensors.create(size);
+	tf.rows = tf.m_tensors.rows;
+	tf.cols = tf.m_tensors.cols;
+
     for (StructureTensor2x2 & t : tf.m_tensors)
     {
         t = tensor;
