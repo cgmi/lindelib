@@ -133,6 +133,7 @@ public:
     glm::vec2 getMinEigenvector(int i, int j) const;
     glm::vec2 getMinEigenvector(const glm::vec2 & pos) const;
     glm::vec2 getMaxEigenvector(int i, int j) const;
+	glm::vec2 getMaxEigenvector(const glm::vec2 & pos) const;
 
     const StructureTensor2x2 & getTensor(int i, int j) const;
     StructureTensor2x2 & getTensor(int i, int j);
@@ -175,6 +176,8 @@ public:
 
     static
     void RungeKutta4_MinEigenvector(const StructureTensorField & field, const glm::vec2 & pos, glm::vec2 & dir, float stepSize = sqrt(2.f), bool normalize = true);
+	static
+	void RungeKutta4_MaxEigenvector(const StructureTensorField & field, const glm::vec2 & pos, glm::vec2 & dir, float stepSize = sqrt(2.f), bool normalize = true);
 
 private:
 

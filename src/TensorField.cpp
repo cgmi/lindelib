@@ -612,6 +612,12 @@ glm::vec2 StructureTensorField::getMaxEigenvector(int i, int j) const
     return m_tensors(i, j).getMaxEigenvector();
 }
 
+glm::vec2 StructureTensorField::getMaxEigenvector(const glm::vec2 & pos) const
+{
+	StructureTensor2x2 t = interpolated(m_tensors, pos);
+	return t.getMaxEigenvector();
+}
+
 const StructureTensor2x2 & StructureTensorField::getTensor(int i, int j) const
 {
     return m_tensors(i, j);
@@ -951,6 +957,25 @@ void StructureTensorField::RungeKutta4_MinEigenvector(const StructureTensorField
     k4 = h * f(field, y0 + k3, normalize);
 
     dir = (h / 6.f) * (k1 + 2.f * k2 + 2.f * k3 + k4);
+}
+
+static inline glm::vec2 F(const StructureTensorField & field, const glm::vec2 & y, bool normalize)
+{
+	glm::vec2 v = field.getMaxEigenvector(y);
+	return (normalize) ? glm::normalize(v) : v;
+}
+
+void StructureTensorField::RungeKutta4_MaxEigenvector(const StructureTensorField & field, const glm::vec2 & pos, glm::vec2 & dir, float h, bool normalize)
+{
+	glm::vec2 k1, k2, k3, k4;
+	glm::vec2 y0 = pos;
+
+	k1 = h * F(field, y0, normalize);
+	k2 = h * F(field, y0 + k1 * 0.5f, normalize);
+	k3 = h * F(field, y0 + k2 * 0.5f, normalize);
+	k4 = h * F(field, y0 + k3, normalize);
+
+	dir = (h / 6.f) * (k1 + 2.f * k2 + 2.f * k3 + k4);
 }
 
 
