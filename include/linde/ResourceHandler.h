@@ -13,8 +13,8 @@ class ResourceHandler
 	
 	private:
 	
-		ResourceHandler() {};
-		~ResourceHandler() {};
+        ResourceHandler() {}
+        ~ResourceHandler() {}
 };
 
 #endif // RESOURCEHANDLER_H

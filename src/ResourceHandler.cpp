@@ -22,6 +22,7 @@ std::string ResourceHandler::getResource(const std::string &s)
 				std::cout << "Could not find your 'resources.path' file!\n";
 				return std::string();
 			}
+            stream.close();
 		}
 		return localPathToResource.append(s);
 	}
