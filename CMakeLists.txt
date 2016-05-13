@@ -38,6 +38,7 @@ list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/Segmentatio
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/StructureExtraction.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/Histogram.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/PaintComposer.h)
+list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/ResourceHandler.h)
 
 # add my sources to project
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Interpolation.cpp)
@@ -61,6 +62,7 @@ list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Convolution.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/StructureExtraction.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/PaintComposer.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Histogram.cpp)
+list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/ResourceHandler.cpp)
 
 # OpenGL
 find_package(OpenGL REQUIRED)
