@@ -11,15 +11,10 @@ std::string ResourceHandler::getResource(const std::string &s)
     {
         // local path not yet loaded
         std::ifstream stream("../resources.path");
-        std::ifstream stream2("resources.path");
         if (stream.is_open())
         {
             std::getline(stream, localPathToResource);
             stream.close();
-        } else if (stream2.is_open())
-        {
-            std::getline(stream2, localPathToResource);
-            stream2.close();
         }
         else
         {
