@@ -24,6 +24,6 @@ std::string ResourceHandler::getResource(const std::string &s)
 			}
             stream.close();
 		}
-		return localPathToResource.append(s);
+		return localPathToResource + s;
 	}
 }
