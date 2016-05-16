@@ -3,7 +3,7 @@
 
 #include "linde.h"
 #include "Color.h"
-
+#include "KubelkaMunk.h"
 
 /**
 * @author Thomas Lindemeier
