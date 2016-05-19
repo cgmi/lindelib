@@ -8,6 +8,7 @@
 #include <glm/gtx/norm.hpp>
 
 #include "../include/linde/Histogram.h"
+#include "../include/linde/Convolution.h"
 
 namespace linde
 {
@@ -966,6 +967,26 @@ void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, con
     cv::merge(splitChannels, out);
 }
 
+void ContrastMask(const cv::Mat_<glm::vec3> &Lab, cv::Mat_<glm::vec3> &out, const float sigma)
+{
+    std::vector<cv::Mat_<float> > splitChannels;
+    cv::split(Lab, splitChannels);
+
+    cv::Mat_<float> a0, a1;
+    cv::GaussianBlur(splitChannels[0], a0, cv::Size(-1, -1), sigma);
+    cv::GaussianBlur(splitChannels[0], a1, cv::Size(-1, -1), 1.6f*sigma);
+
+    cv::Mat_<float> f = a0 - a1;
+
+    if (out.size() != Lab.size())
+    {
+        out.create(Lab.size());
+    }
+    for (uint i = 0; i < Lab.total(); i++)
+    {
+        out(i).x = Lab(i).x + f(i);
+    }
+}
 
 
 
