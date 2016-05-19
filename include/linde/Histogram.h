@@ -37,13 +37,13 @@ public:
     Histogram<T> cumulative();
     Histogram<T> normalized(T low, T high);
 
-    void matchTo(cv::Mat_<T> & image);
+    void matchTo(cv::Mat_<T> & image, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>());
 
     // list of most occuring values, descending
     void sortedValues(std::vector<T> & values) const;
 
-	// drawing
-	void draw(cv::Mat_<glm::vec4> &mat, glm::vec4 color);
+    // drawing
+    void draw(cv::Mat_<glm::vec4> &mat, glm::vec4 color);
 
     // statistics
     T getMean() const;
@@ -139,7 +139,7 @@ void Histogram<T>::create(const cv::Mat_<T> & data, const T &minValue, const T &
     {
         if (!mask.empty() && !mask(i)) continue;
 
-        if (isnan(data(i))) continue;
+        if (std::isnan(data(i))) continue;
 
         uint index = map(data(i));
         if (index < m_bins && index >= 0)
@@ -240,20 +240,25 @@ Histogram<T> Histogram<T>::normalized(T low, T high)
 }
 
 template <class T>
-void Histogram<T>::matchTo(cv::Mat_<T> & image)
+void Histogram<T>::matchTo(cv::Mat_<T> & image, const cv::Mat_<uchar> & mask)
 {
     if (!m_isNormalized)
     {
         Histogram<T> norm = this->normalized(m_minValue, m_maxValue);
-        for (T & v : image)
+        for (uint i = 0; i < image.total(); i++)
         {
-            v = norm.m_histData[norm.map(v)];
-        }
-    }
+            if (!mask.empty() && !mask(i)) continue;
 
-    for (T & v : image)
+            image(i) = norm.m_histData[map(image(i))];
+        }
+    } else
     {
-        v = m_histData[map(v)];
+
+        for (uint i = 0; i < image.total(); i++)
+        {
+            if (!mask.empty() && !mask(i)) continue;
+            image(i) = m_histData[map(image(i))];
+        }
     }
 
 }
@@ -322,69 +327,69 @@ T Histogram<T>::remap(uint index) const
 template <class T>
 void Histogram<T>::draw(cv::Mat_<glm::vec4> &mat, glm::vec4 color)
 {
-	Histogram<T> normHisto = this->normalized(0.f, 1.0f);	
+    Histogram<T> normHisto = this->normalized(0.f, 1.0f);
 
-	// draw rectangle around plot
-	cv::rectangle(mat, cv::Point(0, 0), cv::Point(mat.cols - 1, mat.rows - 1), cv::Scalar(color.x, color.y, color.z, color.w));
+    // draw rectangle around plot
+    cv::rectangle(mat, cv::Point(0, 0), cv::Point(mat.cols - 1, mat.rows - 1), cv::Scalar(color.x, color.y, color.z, color.w));
 
-	int dx = (int) round(mat.cols / (float)m_bins);
-	cv::Point p1;
-	cv::Point p2;
-	uint nrBins = normHisto.getNrBins();
+    int dx = (int) round(mat.cols / (float)m_bins);
+    cv::Point p1;
+    cv::Point p2;
+    uint nrBins = normHisto.getNrBins();
 
-	for (uint i = 0; i < nrBins - 1; ++i)
-	{
-		p1 = cv::Point(i * dx, mat.rows - normHisto.get(i) * (mat.rows - 1));
-		p2 = cv::Point((i + 1) * dx, mat.rows - normHisto.get(i + 1) * (mat.rows - 1));
+    for (uint i = 0; i < nrBins - 1; ++i)
+    {
+        p1 = cv::Point(i * dx, mat.rows - normHisto.get(i) * (mat.rows - 1));
+        p2 = cv::Point((i + 1) * dx, mat.rows - normHisto.get(i + 1) * (mat.rows - 1));
         cv::line(mat, p1, p2, cv::Scalar(0, 0, 0, color.w));
-	}
-	// draw last segment
-	p1 = cv::Point(mat.cols - 1, mat.rows - normHisto.get(nrBins - 1) * (mat.rows - 1));
-	cv::line(mat, p2, p1, cv::Scalar(color.x, color.y, color.z, color.w));
+    }
+    // draw last segment
+    p1 = cv::Point(mat.cols - 1, mat.rows - normHisto.get(nrBins - 1) * (mat.rows - 1));
+    cv::line(mat, p2, p1, cv::Scalar(color.x, color.y, color.z, color.w));
 }
 
- /**
-		3D Histogram
+/**
+        3D Histogram
  */
 class Histogram3D
 {
-	std::vector<float>									m_minValue;
-	std::vector<float>									m_maxValue;
+    std::vector<float>									m_minValue;
+    std::vector<float>									m_maxValue;
 
-	std::vector<std::vector<std::vector<float> > >      m_histData;
-	uint												m_bins;
+    std::vector<std::vector<std::vector<float> > >      m_histData;
+    uint												m_bins;
 
-	bool												m_isNormalized;
+    bool												m_isNormalized;
 
 public:
-	Histogram3D();
-	~Histogram3D();
+    Histogram3D();
+    ~Histogram3D();
 
-	void reset();
-	void add(glm::vec3 v);
+    void reset();
+    void add(glm::vec3 v);
 
 
-	// elements > 0 in mask get counted
-	void create(const cv::Mat_<glm::vec3> & data, const std::vector<float> &minValue, const std::vector<float> &maxValue, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>());
-	void setBins(uint bins);
+    // elements > 0 in mask get counted
+    void create(const cv::Mat_<glm::vec3> & data, const std::vector<float> &minValue, const std::vector<float> &maxValue, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>());
+    void setBins(uint bins);
 
-	//
-	Histogram3D normalized(float low, float high);
+    //
+    Histogram3D normalized(float low, float high);
 
-	// statistics
-	float getMaxBinValue() const;
-	float getNumberOfSamples() const;
-	uint getNumberOfDiscreteClasses() const;
+    // statistics
+    float getMaxBinValue() const;
+    float getNumberOfSamples() const;
+    uint getNumberOfDiscreteClasses() const;
 
-	// access
-	float get(std::vector<uint> bin) const;
-	float get(glm::vec3 value) const;
+    // access
+    float get(std::vector<uint> bin) const;
+    float get(glm::vec3 value) const;
 
-	uint getNrBins() const;
+    uint getNrBins() const;
 
 private:
-	inline std::vector<uint> map(glm::vec3 value) const;
-	inline glm::vec3 remap(std::vector<uint> index) const;
+    inline std::vector<uint> map(glm::vec3 value) const;
+    inline glm::vec3 remap(std::vector<uint> index) const;
 
 };
 

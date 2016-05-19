@@ -142,6 +142,9 @@ float ColorDifference(const glm::vec3 & lab0, const glm::vec3 &lab1);
 
 void AdjustContrast(const cv::Mat_<float> & source, cv::Mat_<float> & out, const float low, const float high, const float c);
 
+
+void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const cv::Mat_<uchar> &mask = cv::Mat_<uchar>());
+
 /**
     * @author Thomas Lindemeier
     * @date 02.12.2013

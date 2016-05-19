@@ -7,6 +7,8 @@
 #include <glm/gtc/reciprocal.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include "../include/linde/Histogram.h"
+
 namespace linde
 {
 
@@ -230,14 +232,25 @@ void convert_lab2LCHab(const glm::vec3 & Lab, glm::vec3 & LCHab)
 {
     LCHab[0] = Lab[0]; // [0,100]
     LCHab[1] = sqrt(Lab[1]*Lab[1] + Lab[2]*Lab[2]); // [0,100]
-    LCHab[2] = atan2(Lab[2], Lab[1]) + PI<float>(); // [0, 2pi]
+
+    LCHab[2] = atan2(Lab[2], Lab[1]);
+    if (LCHab[2] < 0)
+    {
+        LCHab[2] += TWO_PI<float>(); // [0, 2pi]
+    }
+
 }
 
 void convert_LCHab2lab(const glm::vec3 & LCHab, glm::vec3 & Lab)
 {
     Lab[0] = LCHab[0];
-    Lab[1] = LCHab[1] * cos(LCHab[2] - PI<float>());
-    Lab[2] = LCHab[1] * sin(LCHab[2] - PI<float>());
+    float h = LCHab[2];
+    if (h > linde::PI<float>())
+    {
+        h -= linde::TWO_PI<float>(); // [0, 2pi]
+    }
+    Lab[1] = LCHab[1] * cos(h);
+    Lab[2] = LCHab[1] * sin(h);
 }
 
 
@@ -923,6 +936,34 @@ void AdjustContrast(const cv::Mat_<float> &source, cv::Mat_<float> &out, const f
         const float R_ =  f * (R - 128.f) + 128.f;
         out(i) = mapRange(glm::clamp(R_, 0.f, 255.f), 0.f, 255.f, low, high);
     }
+}
+
+void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const cv::Mat_<uchar> &mask)
+{
+    std::vector<cv::Mat_<float> > splitChannels;
+    cv::split(Lch, splitChannels);
+
+    for (const uint channel : channels)
+    {
+        Histogram<float> hist;
+        if (channel == 0)
+        {
+            hist.setBins(1000.f);
+            hist.create(splitChannels[channel], 0.f, 100.f);
+        } else if (channel == 1)
+        {
+            hist.setBins(1000.f);
+            hist.create(splitChannels[channel], 0.f, 100.f);
+        } else if (channel == 2)
+        {
+            hist.setBins(1000.f);
+            hist.create(splitChannels[channel], 0.f, TWO_PI<float>());
+        }
+
+        hist.cumulative().matchTo(splitChannels[channel]);
+    }
+
+    cv::merge(splitChannels, Lch);
 }
 
 
