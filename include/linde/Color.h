@@ -139,12 +139,13 @@ float ColorSimilarity(const glm::vec3 & lab0, const glm::vec3 &lab1);
 * */
 float ColorDifference(const glm::vec3 & lab0, const glm::vec3 &lab1);
 
-
+// adjust contrast in an image
 void AdjustContrast(const cv::Mat_<float> & source, cv::Mat_<float> & out, const float low, const float high, const float c);
 
-
+// histogram equalization channelwise
 void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const cv::Mat_<uchar> &mask = cv::Mat_<uchar>());
 
+// enhance contrast at edges using a DoG filter, the resulting response of the DoG is added to the image to make dark spots near edges darker and light lighter
 void ContrastEdgeEnhance(const cv::Mat_<glm::vec3> & source, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const float sigma);
 
 /**
