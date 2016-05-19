@@ -908,6 +908,23 @@ void floydSteinberg(const cv::Mat_<glm::vec3> & source, cv::Mat_<glm::vec3> & ou
     out = temp;
 }
 
+void AdjustContrast(const cv::Mat_<float> &source, cv::Mat_<float> &out, const float low, const float high, const float c)
+{
+    if (out.size() != source.size())
+    {
+        out.create(source.size());
+    }
+
+    const float f = (259.f * (c + 255.f)) / (255.f * (259.f - c));
+
+    for (uint i = 0; i < out.total(); i++)
+    {
+        const float R = mapRange(source(i), low, high, 0.f, 255.f);
+        const float R_ =  f * (R - 128.f) + 128.f;
+        out(i) = mapRange(glm::clamp(R_, 0.f, 255.f), 0.f, 255.f, low, high);
+    }
+}
+
 
 
 

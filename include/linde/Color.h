@@ -140,6 +140,7 @@ float ColorSimilarity(const glm::vec3 & lab0, const glm::vec3 &lab1);
 float ColorDifference(const glm::vec3 & lab0, const glm::vec3 &lab1);
 
 
+void AdjustContrast(const cv::Mat_<float> & source, cv::Mat_<float> & out, const float low, const float high, const float c);
 
 /**
     * @author Thomas Lindemeier
