@@ -967,24 +967,26 @@ void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, con
     cv::merge(splitChannels, out);
 }
 
-void ContrastMask(const cv::Mat_<glm::vec3> &Lab, cv::Mat_<glm::vec3> &out, const float sigma)
+void ContrastEdgeEnhance(const cv::Mat_<glm::vec3> &source, cv::Mat_<glm::vec3> &out, const std::vector<uint> & channels, const float sigma)
 {
     std::vector<cv::Mat_<float> > splitChannels;
-    cv::split(Lab, splitChannels);
+    cv::split(source, splitChannels);
 
-    cv::Mat_<float> a0, a1;
-    cv::GaussianBlur(splitChannels[0], a0, cv::Size(-1, -1), sigma);
-    cv::GaussianBlur(splitChannels[0], a1, cv::Size(-1, -1), 1.6f*sigma);
-
-    cv::Mat_<float> f = a0 - a1;
-
-    if (out.size() != Lab.size())
+    if (out.size() != source.size())
     {
-        out.create(Lab.size());
+        out.create(source.size());
     }
-    for (uint i = 0; i < Lab.total(); i++)
+    cv::Mat_<float> a1;
+    for (const uint channel : channels)
     {
-        out(i).x = Lab(i).x + f(i);
+        cv::GaussianBlur(splitChannels[channel], a1, cv::Size(-1, -1), sigma);
+
+        cv::Mat_<float> f = splitChannels[channel] - a1;
+
+        for (uint i = 0; i < source.total(); i++)
+        {
+            out(i)[channel] = source(i)[channel] + f(i);
+        }
     }
 }
 

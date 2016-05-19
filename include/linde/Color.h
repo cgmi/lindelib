@@ -145,7 +145,7 @@ void AdjustContrast(const cv::Mat_<float> & source, cv::Mat_<float> & out, const
 
 void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const cv::Mat_<uchar> &mask = cv::Mat_<uchar>());
 
-void ContrastMask(const cv::Mat_<glm::vec3> & Lab, cv::Mat_<glm::vec3> & out, const float sigma);
+void ContrastEdgeEnhance(const cv::Mat_<glm::vec3> & source, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const float sigma);
 
 /**
     * @author Thomas Lindemeier
