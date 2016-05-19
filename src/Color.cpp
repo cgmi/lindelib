@@ -949,21 +949,21 @@ void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, con
         if (channel == 0)
         {
             hist.setBins(1000.f);
-            hist.create(splitChannels[channel], 0.f, 100.f);
+            hist.create(splitChannels[channel], 0.f, 100.f, mask);
         } else if (channel == 1)
         {
             hist.setBins(1000.f);
-            hist.create(splitChannels[channel], 0.f, 100.f);
+            hist.create(splitChannels[channel], 0.f, 100.f, mask);
         } else if (channel == 2)
         {
             hist.setBins(1000.f);
-            hist.create(splitChannels[channel], 0.f, TWO_PI<float>());
+            hist.create(splitChannels[channel], 0.f, TWO_PI<float>(), mask);
         }
 
-        hist.cumulative().matchTo(splitChannels[channel]);
+        hist.cumulative().matchTo(splitChannels[channel], mask);
     }
 
-    cv::merge(splitChannels, Lch);
+    cv::merge(splitChannels, out);
 }
 
 
