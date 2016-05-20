@@ -106,7 +106,7 @@ std::string extractFiletype(const std::string & filename)
 // opencv imRead wrapper
 // retuns floating point RGB(A) image, 3 or 4 channel
 // think about sRGB -> RGB conversion afterwards
-cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal)
+cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal, convert_color_call colorConversion)
 {
     std::string filename = filenameOriginal;
     std::replace(filename.begin(), filename.end(), '\\', '/');
@@ -148,6 +148,10 @@ cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal)
     cv::cvtColor(cv_mat, cv_mat, cv::COLOR_BGR2RGB);
 
     cv::Mat_<glm::vec3> res = cv_mat;
+    if (colorConversion)
+    {
+        convert_image(res, res, colorConversion);
+    }
 
     return res;
 }
@@ -188,7 +192,7 @@ cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal)
 // opencv imRead wrapper
 // retuns floating point RGB(A) image, 3 or 4 channel
 // think about sRGB -> RGB conversion afterwards
-cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer)
+cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer,  convert_color_call colorConversion)
 {
 
     cv::Mat cv_mat = cv::imdecode(buffer, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_COLOR);
@@ -228,6 +232,10 @@ cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer)
     cv::cvtColor(cv_mat, cv_mat, cv::COLOR_BGR2RGB);
 
     cv::Mat_<glm::vec3> res = cv_mat;
+    if (colorConversion)
+    {
+        convert_image(res, res, colorConversion);
+    }
 
     return res;
 }

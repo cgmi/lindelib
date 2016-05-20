@@ -30,8 +30,8 @@ namespace linde
 	// opencv imRead wrapper
 	// retuns floating point RGB(A) image, 3 or 4 channel
 	// think about sRGB -> RGB conversion afterwards
-	cv::Mat_<glm::vec3> imLoad(const std::string & filename);
-    cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> & buffer);
+    cv::Mat_<glm::vec3> imLoad(const std::string & filename, convert_color_call colorConversion = nullptr);
+    cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> & buffer, convert_color_call colorConversion = nullptr);
     cv::Mat_<float>     imLoadSingleChannel(const std::string & filename);
 
 	// opencv wrapper for imWrite

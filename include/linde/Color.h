@@ -146,7 +146,7 @@ void AdjustContrast(const cv::Mat_<float> & source, cv::Mat_<float> & out, const
 void EqualizeLch(const cv::Mat_<glm::vec3> & Lch, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const cv::Mat_<uchar> &mask = cv::Mat_<uchar>());
 
 // enhance contrast at edges using a DoG filter, the resulting response of the DoG is added to the image to make dark spots near edges darker and light lighter
-void ContrastEdgeEnhance(const cv::Mat_<glm::vec3> & source, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const float sigma);
+void SharpenEdges(const cv::Mat_<glm::vec3> & source, cv::Mat_<glm::vec3> & out, const std::vector<uint> & channels, const float sigma0, const float sigma1 = -1.f);
 
 /**
     * @author Thomas Lindemeier
