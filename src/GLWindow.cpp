@@ -1,8 +1,10 @@
 #include "../include/linde/GLWindow.h"
 #include "../include/linde/FrameBufferObject.h"
+#include "../include/linde/FrameBufferObjectMultisample.h"
 #include "../include/linde/VertexBufferObject.h"
 #include "../include/linde/Shader.h"
 #include "../include/linde/Texture.h"
+#include "../include//linde/TextureMultisample.h"
 #include "../include/linde/ShaderStorageBuffer.h"
 #include "../include/linde/TextRenderer.h"
 
@@ -575,6 +577,13 @@ std::shared_ptr<Texture> GLWindow::createTexture(const cv::Mat_<uchar> & source,
     return tex;
 }
 
+std::shared_ptr<TextureMultisample> GLWindow::createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples, GLenum internalFormat, GLboolean fixedSampleLocation)
+{
+	makeContextCurrent();
+
+	return std::shared_ptr<TextureMultisample>(new TextureMultisample(width, height, samples, internalFormat, fixedSampleLocation));
+}
+
 std::shared_ptr<Shader> GLWindow::createPipelineShader(const std::string &vertexSource, const std::string &fragSource)
 {
     makeContextCurrent();
@@ -614,6 +623,13 @@ std::shared_ptr<FrameBufferObject> GLWindow::createFramebufferObject()
     makeContextCurrent();
 
     return std::shared_ptr<FrameBufferObject>(new FrameBufferObject);
+}
+
+std::shared_ptr<FrameBufferObjectMultisample> GLWindow::createFramebufferObjectMultisample()
+{
+	makeContextCurrent();
+
+	return std::shared_ptr<FrameBufferObjectMultisample>(new FrameBufferObjectMultisample);
 }
 
 std::shared_ptr<ShaderStorageBufferObject>   GLWindow::createShaderStoragebufferObject()

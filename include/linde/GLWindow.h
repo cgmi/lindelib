@@ -27,8 +27,10 @@ class AbstractShader;
 class Shader;
 class ComputeShader;
 class Texture;
+class TextureMultisample;
 class VertexBufferObject;
 class FrameBufferObject;
+class FrameBufferObjectMultisample;
 class ShaderStorageBufferObject;
 
 /**
@@ -150,39 +152,43 @@ public:
             GLint fontSize = 12);
 
     template <typename T>
-    std::shared_ptr<Slider<T> >                 addSlider(const std::string & text,
-                                                          T minValue, T maxValue, T * value);
-    std::shared_ptr<Label>                      addLabel(const std::string & text);
-    std::shared_ptr<CheckBox>                   addCheckBox(const std::string & text,
-                                                            bool * checked);
-    std::shared_ptr<DropDownBox>                addDropDownBox(const std::string & text,
-                                                               const std::vector<std::string> & options,
-                                                               int * selection, const std::function<void(int)> & callback);
-    std::shared_ptr<Button>                     addButton(const std::string & text,
-                                                          const std::function<void()> &  callback);
+    std::shared_ptr<Slider<T> >								addSlider(const std::string & text,
+															          T minValue, T maxValue, T * value);
+    std::shared_ptr<Label>									addLabel(const std::string & text);
+    std::shared_ptr<CheckBox>								addCheckBox(const std::string & text,
+															            bool * checked);
+    std::shared_ptr<DropDownBox>							addDropDownBox(const std::string & text,
+															               const std::vector<std::string> & options,
+															               int * selection, const std::function<void(int)> & callback);
+    std::shared_ptr<Button>									addButton(const std::string & text,
+															          const std::function<void()> &  callback);
 
-    std::shared_ptr<Texture>                    createTexture(GLsizei width, GLsizei height,
-                                                      GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
-                                                      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-    std::shared_ptr<Texture>                    createTexture(const cv::Mat_<glm::vec3> & source,
-                                                      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-    std::shared_ptr<Texture>                    createTexture(const cv::Mat_<glm::vec4> & source,
-                                                      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-    std::shared_ptr<Texture>                    createTexture(const cv::Mat_<float> & source,
-                                                      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-    std::shared_ptr<Texture>                    createTexture(const cv::Mat_<uchar> & source,
-                                                      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-    std::shared_ptr<Shader>                     createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
-    std::shared_ptr<Shader>                     createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
-    std::shared_ptr<ComputeShader>              createComputeShader(const std::string &source);
-    std::shared_ptr<VertexBufferObject>         createVertexBufferObject();
-    std::shared_ptr<FrameBufferObject>          createFramebufferObject();
-    std::shared_ptr<ShaderStorageBufferObject>  createShaderStoragebufferObject();
+    std::shared_ptr<Texture>								createTexture(GLsizei width, GLsizei height,
+															      GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
+															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+    std::shared_ptr<Texture>								createTexture(const cv::Mat_<glm::vec3> & source,
+															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+    std::shared_ptr<Texture>								createTexture(const cv::Mat_<glm::vec4> & source,
+															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+    std::shared_ptr<Texture>								createTexture(const cv::Mat_<float> & source,
+															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+    std::shared_ptr<Texture>								createTexture(const cv::Mat_<uchar> & source,
+															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+	std::shared_ptr<TextureMultisample>						createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples,
+															GLenum internalFormat = GL_RGBA, GLboolean fixedSampleLocation = GL_FALSE);
+
+    std::shared_ptr<Shader>									createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
+    std::shared_ptr<Shader>									createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
+    std::shared_ptr<ComputeShader>							createComputeShader(const std::string &source);
+    std::shared_ptr<VertexBufferObject>						createVertexBufferObject();
+    std::shared_ptr<FrameBufferObject>					    createFramebufferObject();
+	std::shared_ptr<FrameBufferObjectMultisample>           createFramebufferObjectMultisample();
+    std::shared_ptr<ShaderStorageBufferObject>				createShaderStoragebufferObject();
 };
 
 

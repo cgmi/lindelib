@@ -182,6 +182,30 @@ private:
     std::uniform_real_distribution<double>*	dis;
 };
 
+class PseudoRandom
+{
+public:
+	PseudoRandom(double low, double high)
+	{
+		rd = new std::default_random_engine;
+		gen = new std::mt19937((*rd)());
+		dis = new std::uniform_real_distribution<double>(low, high);
+	}
+	~PseudoRandom()
+	{
+		delete dis;
+		delete gen;
+		delete rd;
+	}
+
+	double next() const { return (*dis)(*gen); }
+	double operator()() const { return next(); }
+private:
+	std::default_random_engine	*			rd;
+	std::mt19937		*					gen;
+	std::uniform_real_distribution<double>*	dis;
+};
+
 // parallel for
 // only used if parallel pattern lib is enabled (only MSVC >= 2010)
 template <class Iterator, class Function>
