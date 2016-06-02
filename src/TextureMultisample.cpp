@@ -23,8 +23,6 @@ TextureMultisample::TextureMultisample()
     m_height(0),
     m_internalFormat(GL_RGBA),
     m_envMode(GL_REPLACE),
-    m_createMipMaps(GL_FALSE),
-	m_manualMipMaps(GL_FALSE),
 	m_created(GL_FALSE)
 {
 
@@ -40,8 +38,6 @@ TextureMultisample::TextureMultisample(GLsizei width, GLsizei height, GLsizei nu
 	m_fixedSampleLocations(fixedSampleLocations),
     m_internalFormat(internalFormat),
     m_envMode(envMode),
-    m_createMipMaps(GL_FALSE),
-    m_manualMipMaps(GL_FALSE),
 	m_created(GL_FALSE)
 {
 
@@ -66,11 +62,6 @@ void TextureMultisample::create()
 {
     glGenTextures(1, &m_id);
     glBindTexture(m_target, m_id);
-
-    if (m_createMipMaps)
-    {
-        glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
-    }
 
 	glTexImage2DMultisample(m_target, m_samples, m_internalFormat, m_width, m_height, m_fixedSampleLocations);
 

@@ -49,12 +49,6 @@ public:
 
     GLint getInternalFormat() const;
 
-    GLint getMinFilter() const;
-
-    GLint getMagFilter() const;
-
-    GLfloat getWrap() const;
-
     GLint getEnvMode() const;
 
     GLenum getTarget() const;
@@ -68,8 +62,6 @@ private:
 	GLboolean m_fixedSampleLocations;
     GLenum  m_internalFormat;
     GLint   m_envMode;
-    GLboolean m_createMipMaps;
-    GLboolean m_manualMipMaps;
 
 	GLboolean m_created;
 };
