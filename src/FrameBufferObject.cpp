@@ -5,8 +5,6 @@
 namespace linde
 {
 
-
-
 FrameBufferObject::FrameBufferObject() :
     m_target(nullptr),
     m_depth(nullptr)
@@ -17,6 +15,11 @@ FrameBufferObject::FrameBufferObject() :
 FrameBufferObject::~FrameBufferObject()
 {
     glDeleteFramebuffers(1, &m_handle);
+}
+
+GLuint FrameBufferObject::id() const
+{
+	return m_handle;
 }
 
 GLvoid FrameBufferObject::bind(GLboolean bind)
@@ -139,7 +142,5 @@ GLboolean FrameBufferObject::checkStatus()
 
     return result;
 }
-
-
 
 } // namespace linde

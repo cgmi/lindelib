@@ -1,7 +1,6 @@
 #include "../include/linde/TextureMultisample.h"
 #include "../include/linde/GLWindow.h"
 
-
 namespace linde
 {
 /*
@@ -124,55 +123,6 @@ void TextureMultisample::setEnvMode(GLint envMode)
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_envMode);
 
 	unbind();
-}
-
-void TextureMultisample::render(GLfloat posX, GLfloat posY, GLfloat width, GLfloat height)
-{
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-    // deactivate color clamping
-    glClampColor(GL_CLAMP_VERTEX_COLOR_ARB, GL_FALSE);
-    glClampColor(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
-    glClampColor(GL_CLAMP_FRAGMENT_COLOR_ARB, GL_FALSE);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    glColor4f(1.0, 1.0, 1.0, 1.0f);
-
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
-    bind();
-
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glDisable(GL_DEPTH_TEST);
-
-    enable2D();
-    glPushMatrix();
-    glTranslatef(posX, posY, 0.0f);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex3f(width, 0.0f, 0.0f);
-
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f(width, height, 0.0f);
-
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(0.0, height, 0.0f);
-    glEnd();
-    glPopMatrix();
-    disable2D();
-
-	unbind();
-
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_DEPTH_TEST);
-
-    glPopAttrib();
 }
 
 } // namespace linde

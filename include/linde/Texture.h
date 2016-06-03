@@ -6,7 +6,6 @@
 
 #include "linde.h"
 
-
 namespace linde
 {
 
@@ -30,7 +29,6 @@ class Texture
 public:
 
     ~Texture();
-
 
 	void bind();
 	// used for binding at shader location for write andor read operations, acess:: GL_READ_ONLY, GL_WRITE_ONLY, or GL_READ_WRITE
@@ -96,8 +94,6 @@ private:
 
 	GLboolean m_created;
 };
-
-
 
 }// namespace linde
 

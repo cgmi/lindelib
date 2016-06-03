@@ -1,4 +1,5 @@
 #include "../include/linde/FrameBufferObjectMultisample.h"
+#include "../include/linde/FrameBufferObject.h"
 #include "../include/linde/TextureMultisample.h"
 #include "../include/linde/GLWindow.h"
 
@@ -18,6 +19,11 @@ FrameBufferObjectMultisample::~FrameBufferObjectMultisample()
     glDeleteFramebuffers(1, &m_handle);
 }
 
+GLuint FrameBufferObjectMultisample::id() const
+{
+	return m_handle;
+}
+
 GLvoid FrameBufferObjectMultisample::bind(GLboolean bind)
 {
     if (bind)
@@ -32,20 +38,28 @@ GLvoid FrameBufferObjectMultisample::bind(GLboolean bind)
     }
 }
 
-void FrameBufferObjectMultisample::blitColor()
+void FrameBufferObjectMultisample::blit(const std::shared_ptr<FrameBufferObject> &fbo)
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);   
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->id());
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_handle);
-	glDrawBuffer(GL_BACK);                      
 	glBlitFramebuffer(0, 0, m_target->width(), m_target->height(), 0, 0, m_target->width(), m_target->height(), GL_COLOR_BUFFER_BIT, m_filtering);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferObjectMultisample::blitDepth()
+void FrameBufferObjectMultisample::blitColor(const std::shared_ptr<FrameBufferObject> &fbo)
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->id());
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_handle);
-	glDrawBuffer(GL_BACK);
+	glBlitFramebuffer(0, 0, m_target->width(), m_target->height(), 0, 0, m_target->width(), m_target->height(), GL_COLOR_BUFFER_BIT, m_filtering);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBufferObjectMultisample::blitDepth(const std::shared_ptr<FrameBufferObject> &fbo)
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->id());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_handle);
 	glBlitFramebuffer(0, 0, m_target->width(), m_target->height(), 0, 0, m_target->width(), m_target->height(), GL_DEPTH_BUFFER_BIT, m_filtering);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBufferObjectMultisample::setFiltering(GLint filtering)
@@ -110,7 +124,7 @@ GLboolean FrameBufferObjectMultisample::checkStatus()
     switch (status)
     {
     case GL_FRAMEBUFFER_COMPLETE_EXT:
-        std::cerr << "FRAMEBUFFERMULTISAMPLE::Complete" << std::endl;
+        //std::cerr << "FRAMEBUFFERMULTISAMPLE::Complete" << std::endl;
         result = true;
         break;
 

@@ -6,7 +6,6 @@
 
 #include "linde.h"
 
-
 namespace linde
 {
 
@@ -15,6 +14,7 @@ class FrameBufferObject;
 
 /**
 * @author Marc Spicker, Thomas Lindemeier, Sören Pirk
+* @date 03.06.2016
 */
 class TextureMultisample
 {
@@ -38,8 +38,6 @@ public:
     void setEnvMode(GLint envMode);
 
     void deleteTex();
-
-    void render(GLfloat posX, GLfloat posY, GLfloat width, GLfloat height);
 
     GLuint id() const;
     GLuint width() const { return m_width; }

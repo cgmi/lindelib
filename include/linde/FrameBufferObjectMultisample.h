@@ -1,11 +1,8 @@
 #ifndef LINDE_FBO_MULTISAMPLE_H
 #define LINDE_FBO_MULTISAMPLE_H
 
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include <map>
 
 #include "linde.h"
 
@@ -13,6 +10,7 @@ namespace linde
 {
 
 class TextureMultisample;
+class FrameBufferObject;
 class GLWindow;
 
 /*
@@ -27,8 +25,8 @@ class GLWindow;
 #################################################################################
 */
 /**
-* @author Thomas Lindemeier
-* @date 03.06.2013
+* @author Marc Spicker, Thomas Lindemeier
+* @date 03.06.2016
 *
 * University of Konstanz-
 * Department for Computergraphics
@@ -47,10 +45,13 @@ class FrameBufferObjectMultisample
 public:
     ~FrameBufferObjectMultisample();
 
+	GLuint id() const;
+
     GLvoid bind(GLboolean bind);
 
-	void blitColor();
-	void blitDepth();
+	void blit(const std::shared_ptr<FrameBufferObject> &fbo);
+	void blitColor(const std::shared_ptr<FrameBufferObject> &fbo);
+	void blitDepth(const std::shared_ptr<FrameBufferObject> &fbo);
 
 	void setFiltering(GLint filtering);
 

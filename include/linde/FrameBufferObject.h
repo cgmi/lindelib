@@ -1,11 +1,8 @@
 #ifndef LINDE_FBO_H
 #define LINDE_FBO_H
 
-
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-#include <map>
 
 #include "linde.h"
 
@@ -46,6 +43,8 @@ class FrameBufferObject
     FrameBufferObject();
 public:
     ~FrameBufferObject();
+
+	GLuint id() const;
 
     GLvoid bind(GLboolean bind);
 
