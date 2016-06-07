@@ -206,6 +206,51 @@ private:
 	std::uniform_real_distribution<double>*	dis;
 };
 
+template <class T>
+class TerminationCriteria
+{
+private:
+    const uint  maxIterations;
+    const T     epsilon;
+public:
+    TerminationCriteria() = delete;
+    TerminationCriteria(const uint maxIterations, const T & epsilon):
+        maxIterations(maxIterations),
+        epsilon(epsilon)
+    {}
+
+    ~TerminationCriteria(){}
+
+    uint    getMaxIterations() const {return maxIterations;}
+    T       getEpsilon() const {return epsilon;}
+};
+
+template <class T>
+T PickFromSequence(std::vector<std::pair<T, double> > & elements)
+{
+    static std::random_device dev;
+
+    std::sort(elements.begin(), elements.end(), [](const auto & p0, const auto &p1){return p0.second < p1.second;});
+
+    double w = 0.;
+    for (uint i = 0; i < elements.size(); i++)
+    {
+        w += elements[i].second;
+    }
+
+    std::uniform_real_distribution<double> dice(0., w);
+    double d = dice(dev);
+    for(uint i = 0; i < elements.size(); i++)
+    {
+        if(d < elements[i].second)
+        {
+            return elements[i].first;
+        }
+        d -= elements[i].second;
+    }
+    return elements[0].first;
+}
+
 // parallel for
 // only used if parallel pattern lib is enabled (only MSVC >= 2010)
 template <class Iterator, class Function>
