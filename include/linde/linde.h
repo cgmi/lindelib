@@ -236,7 +236,7 @@ Iterator PickWeighted(Iterator first, Iterator last, PIterator first2)
 
     std::vector<size_t> indices(std::distance(first, last));
     std::iota(indices.begin(), indices.end(), 0);
-    std::sort(indices.begin(), indices.end(), [&](const auto & p0, const auto &p1){return *(first2 + p0) < *(first2 + p1);});
+	std::sort(indices.begin(), indices.end(), [&](const size_t & p0, const size_t &p1){return *(first2 + p0) < *(first2 + p1); });
 
     double w = 0.;
     auto it = first;
