@@ -48,15 +48,20 @@ class GLWindow
     friend class ShaderStorageBufferObject;
 
 
-    GLFWwindow		*                               m_glfwWindow;
-    TextRenderer	*                               m_textRenderer;
-    GUI_stuff                                       m_gui;
+    GLFWwindow		*									m_glfwWindow;
+    TextRenderer	*									m_textRenderer;
+    GUI_stuff											m_gui;
 
-    std::vector<std::weak_ptr<AbstractShader> >     m_shaders;
+    std::vector<std::weak_ptr<AbstractShader> >			m_shaders;
 
-    std::shared_ptr<ProgressBar>                    m_progressBar;
+    std::shared_ptr<ProgressBar>						m_progressBar;
 
-    std::function<void ()>                          m_renderFunction;
+    std::function<void ()>								m_renderFunction;
+	std::function<void (GLint, GLint, GLint, GLint)>	m_onKeyFunction;
+	std::function<void(GLint, GLint, GLint)>			m_onMouseFunction;
+	std::function<void(GLdouble, GLdouble)>				m_onMouseMoveFunction;
+	std::function<void(GLdouble, GLdouble)>				m_onScrollFunction;
+	std::function<void(GLint, GLint)>					m_onResizeFunction;
 
 public:
     GLWindow(GLuint width, GLuint height, const std::string & name = "window",
@@ -93,18 +98,14 @@ private:
     void internalOnKey(GLint key, GLint scancode, GLint action, GLint mods);
     void internalOnMouse(GLint button, GLint action, GLint mods);
     void internalOnMouseMove(GLdouble x, GLdouble y);
+	void internalOnScroll(GLdouble xo, GLdouble yo);
+	void internalOnResize(GLint width, GLint height);
 
     void waitEvents() const;
     void swapBuffers() const;
     void renderGUI();
 
 protected:
-    virtual void onKey(GLint key, GLint scancode, GLint action, GLint mods);
-    virtual void onMouse(GLint button, GLint action, GLint mods);
-    virtual void onMouseMove(GLdouble x, GLdouble y);
-    virtual void onScroll(GLdouble xo, GLdouble yo);
-    virtual void onResize(GLint width, GLint height);
-
     GLFWwindow * getGLFW();
 
 public:
@@ -114,8 +115,19 @@ public:
     void update(bool waitForEvents = false);
     void toggleGUI(bool show);
 
+	// setting a custom onKey function
+	void setOnKeyFunction(const std::function<void(GLint, GLint, GLint, GLint)> & onKey);
+	// setting a custom onMouse function
+	void setOnMouseFunction(const std::function<void(GLint, GLint, GLint)> &onMouse);
+	// setting a custom onMouseMove function
+	void setOnMouseMoveFunction(const std::function<void(GLdouble, GLdouble)> &onMouseMove);
+	// setting a custom onScroll function
+	void setOnScrollFunction(const std::function<void(GLdouble, GLdouble)> &onScroll);
+	// setting a custom onResize function
+	void setOnResizeFunction(const std::function<void(GLint, GLint)> &onResize);
     // setting the render function to be called by renderOnce
     void setRenderFunction(const std::function<void()> & renderStep);
+
     // single render step of the given render function and call to update
     void renderOnce(bool waitForEvents = false);
     // loops renderOnce and updates
@@ -128,16 +140,11 @@ public:
 
     GLboolean isGUIActive() const;
 
-    GLint
-    getWidth() const;
-    GLint
-    getHeight() const;
-    void
-    getSize(GLint & width, GLint & height) const;
-    glm::vec2
-    getCursorPos() const;
-    int
-    getMouseButtonState(int button) const;
+    GLint getWidth() const;
+    GLint getHeight() const;
+    void getSize(GLint & width, GLint & height) const;
+    glm::vec2 getCursorPos() const;
+    int getMouseButtonState(int button) const;
 
     GLboolean shouldClose();
 

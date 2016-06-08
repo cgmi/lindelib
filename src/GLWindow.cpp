@@ -26,7 +26,8 @@ GLWindow::GLWindow(GLuint width, GLuint height, const std::string & name,
       m_textRenderer(nullptr),
       m_gui(),
       m_progressBar(nullptr),
-      m_renderFunction(nullptr)
+      m_renderFunction(nullptr),
+	  m_onKeyFunction(nullptr)
 {
     createWindow(width, height, name, redBits, greenBits, blueBits,
                  alphaBits, depthBits, stencilBits,
@@ -186,12 +187,12 @@ void GLWindow::glfw_onMouseMove(GLFWwindow * window, GLdouble x, GLdouble y)
 
 void GLWindow::glfw_onScroll(GLFWwindow * window, GLdouble xo, GLdouble yo)
 {
-    static_cast<GLWindow*>(glfwGetWindowUserPointer(window))->onScroll(xo, yo);
+    static_cast<GLWindow*>(glfwGetWindowUserPointer(window))->internalOnScroll(xo, yo);
 }
 
 void GLWindow::glfw_onResize(GLFWwindow * window, GLint width, GLint height)
 {
-    static_cast<GLWindow*>(glfwGetWindowUserPointer(window))->onResize(width, height);
+    static_cast<GLWindow*>(glfwGetWindowUserPointer(window))->internalOnResize(width, height);
 }
 
 
@@ -206,7 +207,9 @@ void GLWindow::internalOnKey(GLint key, GLint scancode, GLint action, GLint mods
             m_gui.m_show = !m_gui.m_show;
         }
     }
-    onKey(key, scancode, action, mods);
+
+	if(m_onKeyFunction)
+		m_onKeyFunction(key, scancode, action, mods);
 }
 
 void GLWindow::internalOnMouse(GLint button, GLint action, GLint mods)
@@ -233,7 +236,8 @@ void GLWindow::internalOnMouse(GLint button, GLint action, GLint mods)
         }
     } else
     {
-        onMouse(button, action, mods);
+		if (m_onMouseFunction)
+			m_onMouseFunction(button, action, mods);
     }
 }
 
@@ -258,7 +262,8 @@ void GLWindow::internalOnMouseMove(GLdouble x, GLdouble y)
         }
     } else
     {
-        onMouseMove(x, y);
+		if (m_onMouseMoveFunction)
+			m_onMouseMoveFunction(x, y);
     }
 }
 
@@ -315,29 +320,17 @@ GLboolean GLWindow::isGUIActive() const
     return m_gui.m_show;
 }
 
-void GLWindow::onKey(GLint key, GLint scancode, GLint action, GLint mods)
+void GLWindow::internalOnScroll(GLdouble xo, GLdouble yo)
 {
-
+	if (m_onScrollFunction)
+		m_onScrollFunction(xo, yo);
 }
 
-void GLWindow::onMouse(GLint button, GLint action, GLint mods)
+void GLWindow::internalOnResize(GLint width, GLint height)
 {
-
-}
-
-void GLWindow::onMouseMove(GLdouble x, GLdouble y)
-{
-
-}
-
-
-void GLWindow::onScroll(GLdouble xo, GLdouble yo)
-{
-}
-
-void GLWindow::onResize(GLint width, GLint height)
-{
-    glViewport(0,0,width,height);
+    glViewport(0, 0, width, height);
+	if (m_onResizeFunction)
+		m_onResizeFunction(width, height);
 }
 
 GLFWwindow * GLWindow::getGLFW()
@@ -381,6 +374,31 @@ void GLWindow::toggleGUI(bool show)
     m_gui.m_show = show;
 }
 
+void GLWindow::setOnKeyFunction(const std::function<void(GLint, GLint, GLint, GLint)>& onKey)
+{
+	m_onKeyFunction = onKey;
+}
+
+void GLWindow::setOnMouseFunction(const std::function<void(GLint, GLint, GLint)>& onMouse)
+{
+	m_onMouseFunction = onMouse;
+}
+
+void GLWindow::setOnMouseMoveFunction(const std::function<void(GLdouble, GLdouble)>& onMouseMove)
+{
+	m_onMouseMoveFunction = onMouseMove;
+}
+
+void GLWindow::setOnScrollFunction(const std::function<void(GLdouble, GLdouble)>& onScroll)
+{
+	m_onScrollFunction = onScroll;
+}
+
+void GLWindow::setOnResizeFunction(const std::function<void(GLint, GLint)>& onResize)
+{
+	m_onResizeFunction = onResize;
+}
+
 void GLWindow::setRenderFunction(const std::function<void ()> &renderStep)
 {
      m_renderFunction = renderStep;
@@ -416,7 +434,7 @@ void GLWindow::resize(GLuint width, GLuint height)
     makeContextCurrent();
 
     glfwSetWindowSize(m_glfwWindow, width, height);
-    onResize(width, height);
+    internalOnResize(width, height);
 }
 
 void GLWindow::clearGUI()
@@ -720,8 +738,4 @@ std::shared_ptr<DropDownBox>  GLWindow::addDropDownBox(const std::string & text,
     return box;
 }
 
-
-
-
-
-}
+} // namespace linde
