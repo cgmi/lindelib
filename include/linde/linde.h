@@ -206,6 +206,7 @@ private:
 	std::uniform_real_distribution<double>*	dis;
 };
 
+// Termination criteria for algorithms
 template <class T>
 class TerminationCriteria
 {
@@ -225,30 +226,38 @@ public:
     T       getEpsilon() const {return epsilon;}
 };
 
-template <class T>
-T PickFromSequence(std::vector<std::pair<T, double> > & elements)
+// pick an element in the range of first last, according to the probabilities stored in first2
+template <class Iterator, class PIterator>
+Iterator PickWeighted(Iterator first, Iterator last, PIterator first2)
 {
     static std::random_device dev;
 
-    std::sort(elements.begin(), elements.end(), [](const auto & p0, const auto &p1){return p0.second < p1.second;});
+    if (std::distance(first, last) <= 0) return last;
+
+    std::vector<size_t> indices(std::distance(first, last));
+    std::iota(indices.begin(), indices.end(), 0);
+    std::sort(indices.begin(), indices.end(), [&](const auto & p0, const auto &p1){return *(first2 + p0) < *(first2 + p1);});
 
     double w = 0.;
-    for (uint i = 0; i < elements.size(); i++)
+    auto it = first;
+    auto it2 = first2;
+    for (; it != last; it++, it2++)
     {
-        w += elements[i].second;
+        w +=  *it2;
     }
 
     std::uniform_real_distribution<double> dice(0., w);
     double d = dice(dev);
-    for(uint i = 0; i < elements.size(); i++)
+    for (auto k = indices.cbegin(); k != indices.cend(); k++)
     {
-        if(d < elements[i].second)
+        if(d < *(first2+*k))
         {
-            return elements[i].first;
+            return (first+*k);
         }
-        d -= elements[i].second;
+        d -= *(first2+*k);
     }
-    return elements[0].first;
+    assert(false);
+    return last;
 }
 
 // parallel for
