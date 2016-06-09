@@ -148,6 +148,12 @@ Paint::Paint(const linde::KMColor &color, float thickness) :
     computeReflectanceAndTransmittance(R, T);
 }
 
+Paint::Paint(const KMColor &color) :
+    Paint(color, 1.f)
+{
+
+}
+
 
 Paint::Paint() :
     m_color(),
@@ -191,6 +197,13 @@ void Paint::setThickness(float thickness)
 void Paint::composeDry(const glm::vec3 &R0, glm::vec3 & Rnew) const
 {
     KMColor::composeDry(R0, R, T, Rnew);
+}
+
+void Paint::mixWith(const Paint &other, const float concentration)
+{
+    m_color.K = glm::mix(m_color.K, other.getColor().getK(), concentration);
+    m_color.S = glm::mix(m_color.S, other.getColor().getS(), concentration);
+    computeReflectanceAndTransmittance(R, T);
 }
 
 } // namespace linde

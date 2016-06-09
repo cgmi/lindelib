@@ -2,6 +2,7 @@
 #define KUBELKAMUNK_H
 
 #include "linde.h"
+#include "Color.h"
 
 /**
         * @author Thomas Lindemeier
@@ -128,6 +129,7 @@ class Paint
 public:
     Paint();
     Paint(const KMColor & color, float thickness);
+    Paint(const KMColor & color);
     ~Paint();
 
     const KMColor & getColor() const;
@@ -139,6 +141,8 @@ public:
     void    setThickness(float thickness);
 
     void composeDry(const glm::vec3 & R0, glm::vec3 &Rnew) const;
+
+    void mixWith(const Paint & other, const float concentration);
 
     Paint& operator= ( const Paint& v)
     {
