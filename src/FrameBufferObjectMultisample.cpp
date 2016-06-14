@@ -42,7 +42,7 @@ void FrameBufferObjectMultisample::blit(const std::shared_ptr<FrameBufferObject>
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo->id());
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_handle);
-	glBlitFramebuffer(0, 0, m_target->width(), m_target->height(), 0, 0, m_target->width(), m_target->height(), GL_COLOR_BUFFER_BIT, m_filtering);
+	glBlitFramebuffer(0, 0, m_target->width(), m_target->height(), 0, 0, m_target->width(), m_target->height(), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, m_filtering);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
