@@ -254,8 +254,8 @@ class Texture;
 
 class GPU_Convolution
 {
-    std::shared_ptr<GLWindow>         m_window;
-    std::shared_ptr<ComputeShader>    m_shader;
+    std::shared_ptr<GLWindow>   m_window;
+    ComputeShader*              m_shader;
 
     GPU_Convolution();
 public:

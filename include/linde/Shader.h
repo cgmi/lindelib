@@ -31,10 +31,6 @@ namespace linde
 
 class AbstractShader
 {
-private:
-    static const std::chrono::milliseconds      REFRESH_DELAY;
-    Stopwatch                                   m_watch;
-
 protected:
 
     GLuint                                      m_progHandle;
@@ -67,12 +63,13 @@ public:
     void setMatrix(const GLchar* label, const glm::mat4 &mat);
     void setMatrix(const GLchar* label, const glm::mat3 &mat);
 
-    void checkShaderReload();
 
     GLuint getCurrentlyBoundProgram() const;
 
-protected:
     virtual void checkShaderChanged() = 0;
+
+private:
+
 };
 
 
@@ -103,16 +100,17 @@ protected:
     GLuint compile(const GLchar *source, GLuint type);
     void cleanUp();
 
-    void checkShaderChanged();
 
     void link() const;
 
 
-    Shader();
-    Shader(const std::string &vFileName, const std::string &fFileName);
-    Shader(const std::string &vFileName, const std::string &gFileName, const std::string &fFileName);
 public:
+    Shader();
+    Shader(const std::string &vFileName, const std::string &gFileName, const std::string &fFileName);
+    Shader(const std::string &vFileName, const std::string &fFileName);
     virtual ~Shader();
+
+    void checkShaderChanged();
 
     void attachVertexShader(const std::string &fileName);
     void attachControlShader(const std::string &fileName);
@@ -152,14 +150,15 @@ protected:
 
     void cleanUp();
 
-    void checkShaderChanged();
 
 
+public:
     ComputeShader();
     ComputeShader(const std::string & filename);
-public:
 
     virtual ~ComputeShader();
+
+    void checkShaderChanged();
 
     // start the job with specified number of groups
     void dispatchCompute(

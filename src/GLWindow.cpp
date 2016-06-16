@@ -13,21 +13,16 @@
 namespace linde
 {
 
-
-static GLint GLFW_INSTANCES = 0;
-
 GLWindow::GLWindow(GLuint width, GLuint height, const std::string & name,
                    GLint redBits, GLint greenBits, GLint blueBits, GLint alphaBits,
                    GLint depthBits, GLint stencilBits, GLuint samples,
                    GLboolean resizable, GLboolean visible, GLboolean sRGB_capable,
                    GLFWmonitor * monitor, GLFWwindow * shareContext)
     :
-      m_glfwWindow(nullptr),
+      m_glfwWindow(nullptr, nullptr),
       m_textRenderer(nullptr),
-      m_gui(),
-      m_progressBar(nullptr),
       m_renderFunction(nullptr),
-	  m_onKeyFunction(nullptr)
+      m_onKeyFunction(nullptr)
 {
     createWindow(width, height, name, redBits, greenBits, blueBits,
                  alphaBits, depthBits, stencilBits,
@@ -38,33 +33,22 @@ GLWindow::GLWindow(GLuint width, GLuint height, const std::string & name,
         glClear(GL_COLOR_BUFFER_BIT);
     };
 
-    glfwSetWindowUserPointer(m_glfwWindow, this);
+    glfwSetWindowUserPointer(m_glfwWindow.get(), this);
 
-    glfwSetKeyCallback(m_glfwWindow, glfw_onKey);
-    glfwSetScrollCallback(m_glfwWindow, glfw_onScroll);
-    glfwSetCursorPosCallback(m_glfwWindow, glfw_onMouseMove);
-    glfwSetMouseButtonCallback(m_glfwWindow, glfw_onMouse);
-    glfwSetWindowSizeCallback(m_glfwWindow, glfw_onResize);
+    glfwSetKeyCallback(m_glfwWindow.get(), glfw_onKey);
+    glfwSetScrollCallback(m_glfwWindow.get(), glfw_onScroll);
+    glfwSetCursorPosCallback(m_glfwWindow.get(), glfw_onMouseMove);
+    glfwSetMouseButtonCallback(m_glfwWindow.get(), glfw_onMouse);
+    glfwSetWindowSizeCallback(m_glfwWindow.get(), glfw_onResize);
 
-    GLFW_INSTANCES++;
+    m_textRenderer = std::make_unique<TextRenderer>();
 
-    m_textRenderer = new TextRenderer;
-
-    m_progressBar = std::make_shared<ProgressBar>(this);
-    m_progressBar->set(-1);
 }
 
 
 GLWindow::~GLWindow()
 {
-    glfwDestroyWindow(m_glfwWindow);
 
-    if (m_textRenderer) delete m_textRenderer;
-
-    if (GLFW_INSTANCES <= 0)
-    {
-        glfwTerminate();
-    }
 }
 
 void GLWindow::onError(GLint errorCode, const char* errorMessage)
@@ -127,9 +111,9 @@ void GLWindow::createWindow(GLuint width, GLuint height, const std::string & nam
 #else
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 #endif
-    m_glfwWindow = glfwCreateWindow(width, height, name.c_str(), monitor, shareContext);
+    m_glfwWindow = std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>(glfwCreateWindow(width, height, name.c_str(), monitor, shareContext), glfwDestroyWindow);
 
-    initGLEW(m_glfwWindow);
+    initGLEW(m_glfwWindow.get());
 
     // opengl error callback
 #if DEBUG_BUILD
@@ -200,142 +184,48 @@ void GLWindow::internalOnKey(GLint key, GLint scancode, GLint action, GLint mods
 {
     makeContextCurrent();
 
-    if (action == GLFW_RELEASE)
-    {
-        if (key == GLFW_KEY_SPACE)
-        {
-            m_gui.m_show = !m_gui.m_show;
-        }
-    }
-
-	if(m_onKeyFunction)
-		m_onKeyFunction(key, scancode, action, mods);
+    if(m_onKeyFunction)
+        m_onKeyFunction(key, scancode, action, mods);
 }
 
 void GLWindow::internalOnMouse(GLint button, GLint action, GLint mods)
 {
     makeContextCurrent();
 
-    // if gui active
-    if (m_gui.m_show)
-    {
+    if (m_onMouseFunction)
+        m_onMouseFunction(button, action, mods);
 
-        // check if gui action could be requested
-        if (button == GLFW_MOUSE_BUTTON_1)
-        {
-            m_gui.m_mouseLeftPressed = (action == GLFW_PRESS);
-            if (m_gui.m_mouseLeftPressed)
-            {
-                GLdouble x, y;
-                glfwGetCursorPos(m_glfwWindow, &x, &y);
-                for (size_t i = 0; i < m_gui.m_elements.size(); i++)
-                {
-                    if (m_gui.m_elements[i]->update(x, y)) break;
-                }
-            }
-        }
-    } else
-    {
-		if (m_onMouseFunction)
-			m_onMouseFunction(button, action, mods);
-    }
 }
 
 void GLWindow::internalOnMouseMove(GLdouble x, GLdouble y)
 {
     makeContextCurrent();
 
-    // if gui active
-    if (m_gui.m_show)
-    {
-        // if mousebutton was pressed for interaction
-        if (m_gui.m_mouseLeftPressed)
-        {
-            for (size_t i = 0; i < m_gui.m_elements.size(); i++)
-            {
-                NeedButtonRelease* v = dynamic_cast<NeedButtonRelease*>(m_gui.m_elements[i].get());
-                if (!v)
-                {
-                    m_gui.m_elements[i]->update(x, y);
-                }
-            }
-        }
-    } else
-    {
-		if (m_onMouseMoveFunction)
-			m_onMouseMoveFunction(x, y);
-    }
+    if (m_onMouseMoveFunction)
+        m_onMouseMoveFunction(x, y);
 }
 
-void GLWindow::renderGUI()
-{
-    // render gui
-    if (m_gui.m_show)
-    {
-        makeContextCurrent();
-
-
-        // render background
-        const GLfloat h = m_gui.m_elementHeight + m_gui.m_nextAvailablePosition[1];
-        enable2D();
-        glTranslatef(0.f, 0.f, 0.0f);
-        glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glBegin(GL_QUADS);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(getWidth(), 0.0f, 0.0f);
-        glVertex3f(getWidth(), h, 0.0f);
-        glVertex3f(0.0, h, 0.0f);
-        glEnd();
-        glDisable(GL_BLEND);
-        disable2D();
-
-        // update gui
-        glm::vec4 color = m_textRenderer->getColor();
-        m_textRenderer->setColor(m_gui.m_overlayColor);
-
-        for (size_t i = 0; i < m_gui.m_elements.size(); i++)
-        {
-            m_gui.m_elements[i]->paint();
-            if (m_gui.m_elements[i]->locked()) break;
-        }
-
-        m_textRenderer->setColor(m_gui.m_overlayColor);
-
-        // write cursor pos
-        glm::dvec2 xy;
-        glfwGetCursorPos(m_glfwWindow, &(xy[0]), &(xy[1]));
-        std::stringstream stream;
-        stream << xy;
-        m_textRenderer->render(stream.str(), glm::vec2(getWidth() - 90.f, 15.f));
-
-        // reset color
-        m_textRenderer->setColor(color);
-    }
-}
-
-GLboolean GLWindow::isGUIActive() const
-{
-    return m_gui.m_show;
-}
 
 void GLWindow::internalOnScroll(GLdouble xo, GLdouble yo)
 {
-	if (m_onScrollFunction)
-		m_onScrollFunction(xo, yo);
+    makeContextCurrent();
+
+    if (m_onScrollFunction)
+        m_onScrollFunction(xo, yo);
 }
 
 void GLWindow::internalOnResize(GLint width, GLint height)
 {
+    makeContextCurrent();
+
     glViewport(0, 0, width, height);
-	if (m_onResizeFunction)
-		m_onResizeFunction(width, height);
+    if (m_onResizeFunction)
+        m_onResizeFunction(width, height);
 }
 
 GLFWwindow * GLWindow::getGLFW()
 {
-    return m_glfwWindow;
+    return m_glfwWindow.get();
 }
 
 
@@ -343,8 +233,6 @@ void GLWindow::update(bool waitForEvents)
 {
     makeContextCurrent();
 
-    renderGUI();
-    m_progressBar->render();
     swapBuffers();
 
     if (waitForEvents)
@@ -354,54 +242,37 @@ void GLWindow::update(bool waitForEvents)
     {
         pollEvents();
     }
-
-    for (auto &  shader : m_shaders)
-    {
-        if (!shader.expired())
-        {
-            shader.lock()->checkShaderReload();
-        }
-    }
-    // remove invalid shaders;
-    m_shaders.erase(std::remove_if(m_shaders.begin(),
-                                   m_shaders.end(),
-                                   [&](const std::weak_ptr<linde::AbstractShader> & p){return p.expired();}),
-                    m_shaders.end());
 }
 
-void GLWindow::toggleGUI(bool show)
-{
-    m_gui.m_show = show;
-}
 
 void GLWindow::setOnKeyFunction(const std::function<void(GLint, GLint, GLint, GLint)>& onKey)
 {
-	m_onKeyFunction = onKey;
+    m_onKeyFunction = onKey;
 }
 
 void GLWindow::setOnMouseFunction(const std::function<void(GLint, GLint, GLint)>& onMouse)
 {
-	m_onMouseFunction = onMouse;
+    m_onMouseFunction = onMouse;
 }
 
 void GLWindow::setOnMouseMoveFunction(const std::function<void(GLdouble, GLdouble)>& onMouseMove)
 {
-	m_onMouseMoveFunction = onMouseMove;
+    m_onMouseMoveFunction = onMouseMove;
 }
 
 void GLWindow::setOnScrollFunction(const std::function<void(GLdouble, GLdouble)>& onScroll)
 {
-	m_onScrollFunction = onScroll;
+    m_onScrollFunction = onScroll;
 }
 
 void GLWindow::setOnResizeFunction(const std::function<void(GLint, GLint)>& onResize)
 {
-	m_onResizeFunction = onResize;
+    m_onResizeFunction = onResize;
 }
 
 void GLWindow::setRenderFunction(const std::function<void ()> &renderStep)
 {
-     m_renderFunction = renderStep;
+    m_renderFunction = renderStep;
 }
 
 void GLWindow::renderOnce(bool waitForEvents)
@@ -415,7 +286,7 @@ int GLWindow::renderLoop(bool waitForEvents)
 {
     while (!shouldClose())
     {
-       renderOnce(waitForEvents);
+        renderOnce(waitForEvents);
     }
     return 0;
 }
@@ -424,32 +295,18 @@ int GLWindow::renderLoop(bool waitForEvents)
 void GLWindow::setVisible(GLboolean show)
 {
     if (show)
-        glfwShowWindow(m_glfwWindow);
+        glfwShowWindow(m_glfwWindow.get());
     else
-        glfwHideWindow(m_glfwWindow);
+        glfwHideWindow(m_glfwWindow.get());
 }
 
 void GLWindow::resize(GLuint width, GLuint height)
 {
     makeContextCurrent();
 
-    glfwSetWindowSize(m_glfwWindow, width, height);
+    glfwSetWindowSize(m_glfwWindow.get(), width, height);
     internalOnResize(width, height);
 }
-
-void GLWindow::clearGUI()
-{
-    makeContextCurrent();
-
-    m_gui.m_elements.clear();
-    m_gui.m_mouseLeftPressed = GL_FALSE;
-    m_gui.m_show = GL_FALSE;
-    m_gui.m_overlayColor = glm::vec4(1.f, 1.f, 1.f, 1.f);
-    m_gui.m_nextAvailablePosition = glm::vec2(10.f, 10.f);
-    m_gui.m_elementHeight = 14.f;
-    m_gui.m_sliderWidth = 200.f;
-}
-
 
 void GLWindow::pollEvents() const
 {
@@ -463,58 +320,53 @@ void GLWindow::waitEvents() const
 
 void GLWindow::swapBuffers() const
 {
-    glfwSwapBuffers(m_glfwWindow);
+    glfwSwapBuffers(m_glfwWindow.get());
 }
 
 GLboolean GLWindow::shouldClose()
 {
-    return glfwWindowShouldClose(m_glfwWindow);
+    return glfwWindowShouldClose(m_glfwWindow.get());
 }
 
 void GLWindow::makeContextCurrent() const
 {
     GLFWwindow * current = glfwGetCurrentContext();
-    if (current != m_glfwWindow)
+    if (current != m_glfwWindow.get())
     {
-        glfwMakeContextCurrent(m_glfwWindow);
+        glfwMakeContextCurrent(m_glfwWindow.get());
     }
-}
-
-std::shared_ptr<ProgressBar> &GLWindow::getProgressBar()
-{
-    return m_progressBar;
 }
 
 GLint GLWindow::getWidth() const
 {
     GLint width, height;
-    glfwGetWindowSize(this->m_glfwWindow, &width, &height);
+    glfwGetWindowSize(this->m_glfwWindow.get(), &width, &height);
     return width;
 }
 
 GLint GLWindow::getHeight() const
 {
     GLint width, height;
-    glfwGetWindowSize(this->m_glfwWindow, &width, &height);
+    glfwGetWindowSize(this->m_glfwWindow.get(), &width, &height);
     return height;
 }
 
 void GLWindow::getSize(GLint & width, GLint & height) const
 {
-    glfwGetWindowSize(this->m_glfwWindow, &width, &height);
+    glfwGetWindowSize(this->m_glfwWindow.get(), &width, &height);
 }
 
 glm::vec2 GLWindow::getCursorPos() const
 {
     double x, y;
-    glfwGetCursorPos(m_glfwWindow, &x, &y);
+    glfwGetCursorPos(m_glfwWindow.get(), &x, &y);
     return glm::vec2(x, y);
 }
 
 
 int GLWindow::getMouseButtonState(int button) const
 {
-    return glfwGetMouseButton(m_glfwWindow, button);
+    return glfwGetMouseButton(m_glfwWindow.get(), button);
 }
 
 void GLWindow::renderText(const std::string & text, const glm::vec2 & pos, const glm::vec4 & color, GLint fontSize)
@@ -597,36 +449,33 @@ std::shared_ptr<Texture> GLWindow::createTexture(const cv::Mat_<uchar> & source,
 
 std::shared_ptr<TextureMultisample> GLWindow::createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples, GLenum internalFormat, GLboolean fixedSampleLocation)
 {
-	makeContextCurrent();
+    makeContextCurrent();
 
-	return std::shared_ptr<TextureMultisample>(new TextureMultisample(width, height, samples, internalFormat, fixedSampleLocation));
+    return std::shared_ptr<TextureMultisample>(new TextureMultisample(width, height, samples, internalFormat, fixedSampleLocation));
 }
 
-std::shared_ptr<Shader> GLWindow::createPipelineShader(const std::string &vertexSource, const std::string &fragSource)
+Shader* GLWindow::createPipelineShader(const std::string &vertexSource, const std::string &fragSource)
 {
     makeContextCurrent();
 
-    std::shared_ptr<Shader> shader(new Shader(vertexSource, fragSource));
-    m_shaders.push_back(shader);
-    return shader;
+    m_shaders.push_back(std::make_unique<Shader>(vertexSource, fragSource));
+    return dynamic_cast<Shader*>(m_shaders.back().get());
 }
 
-std::shared_ptr<Shader> GLWindow::createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource)
+Shader* GLWindow::createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource)
 {
     makeContextCurrent();
 
-    std::shared_ptr<Shader> shader(new Shader(vertexSource, geometrySource, fragSource));
-    m_shaders.push_back(shader);
-    return shader;
+    m_shaders.push_back(std::make_unique<Shader>(vertexSource, geometrySource, fragSource));
+    return dynamic_cast<Shader*>(m_shaders.back().get());
 }
 
-std::shared_ptr<ComputeShader> GLWindow::createComputeShader(const std::string & source)
+ComputeShader* GLWindow::createComputeShader(const std::string & source)
 {
     makeContextCurrent();
 
-    std::shared_ptr<ComputeShader> shader(new ComputeShader(source));
-    m_shaders.push_back(shader);
-    return shader;
+    m_shaders.push_back(std::make_unique<ComputeShader>(source));
+    return dynamic_cast<ComputeShader*>(m_shaders.back().get());
 }
 
 std::shared_ptr<VertexBufferObject>    GLWindow::createVertexBufferObject()
@@ -645,9 +494,9 @@ std::shared_ptr<FrameBufferObject> GLWindow::createFramebufferObject()
 
 std::shared_ptr<FrameBufferObjectMultisample> GLWindow::createFramebufferObjectMultisample()
 {
-	makeContextCurrent();
+    makeContextCurrent();
 
-	return std::shared_ptr<FrameBufferObjectMultisample>(new FrameBufferObjectMultisample);
+    return std::shared_ptr<FrameBufferObjectMultisample>(new FrameBufferObjectMultisample);
 }
 
 std::shared_ptr<ShaderStorageBufferObject>   GLWindow::createShaderStoragebufferObject()
@@ -655,87 +504,6 @@ std::shared_ptr<ShaderStorageBufferObject>   GLWindow::createShaderStoragebuffer
     makeContextCurrent();
 
     return  std::shared_ptr<ShaderStorageBufferObject>(new ShaderStorageBufferObject);
-}
-
-
-std::shared_ptr<Label> GLWindow::addLabel(const std::string & text)
-{
-    makeContextCurrent();
-
-    std::shared_ptr<Label> label = std::make_shared<Label>(
-                this,
-                m_gui.m_nextAvailablePosition[0],
-            m_gui.m_nextAvailablePosition[1],
-            m_gui.m_elementHeight,
-            m_gui.m_elementHeight);
-    label->setText(text);
-    label->setColor(m_gui.m_overlayColor);
-    m_gui.m_elements.push_back(label);
-
-    m_gui.m_nextAvailablePosition[1] += GUIElement::GUI_DISPLACEMENT_FACTOR * m_gui.m_elementHeight;
-
-    return label;
-}
-
-std::shared_ptr<CheckBox> GLWindow::addCheckBox(const std::string & text, bool * checked)
-{
-    makeContextCurrent();
-
-    std::shared_ptr<CheckBox> box = std::make_shared<CheckBox>(
-                this,
-                m_gui.m_nextAvailablePosition[0],
-            m_gui.m_nextAvailablePosition[1],
-            m_gui.m_elementHeight,
-            m_gui.m_elementHeight,
-            checked);
-    box->setText(text);
-    box->setColor(m_gui.m_overlayColor);
-    m_gui.m_elements.push_back(box);
-
-    m_gui.m_nextAvailablePosition[1] += GUIElement::GUI_DISPLACEMENT_FACTOR * m_gui.m_elementHeight;
-
-    return box;
-}
-
-std::shared_ptr<Button> GLWindow::addButton(const std::string & text, const std::function<void()> & callback)
-{
-    makeContextCurrent();
-
-    std::shared_ptr<Button> button = std::make_shared<Button>(
-                this,
-                m_gui.m_nextAvailablePosition[0],
-            m_gui.m_nextAvailablePosition[1],
-            m_gui.m_elementHeight,
-            m_gui.m_elementHeight,
-            callback);
-    button->setText(text);
-    button->setColor(m_gui.m_overlayColor);
-    m_gui.m_elements.push_back(button);
-
-    m_gui.m_nextAvailablePosition[1] += GUIElement::GUI_DISPLACEMENT_FACTOR * m_gui.m_elementHeight;
-
-    return button;
-}
-
-std::shared_ptr<DropDownBox>  GLWindow::addDropDownBox(const std::string & text, const std::vector<std::string> & options, int * selection, const std::function<void(int)> &callback)
-{
-    makeContextCurrent();
-
-    std::shared_ptr<DropDownBox> box = std::make_shared<DropDownBox>(
-                this,
-                m_gui.m_nextAvailablePosition[0],
-            m_gui.m_nextAvailablePosition[1],
-            m_gui.m_sliderWidth,
-            m_gui.m_elementHeight,
-            options, selection, callback);
-
-    box->setText(text);
-    box->setColor(m_gui.m_overlayColor);
-    m_gui.m_elements.push_back(box);
-
-    m_gui.m_nextAvailablePosition[1] += GUIElement::GUI_DISPLACEMENT_FACTOR * m_gui.m_elementHeight;
-
-    return box;
 }
 
 } // namespace linde

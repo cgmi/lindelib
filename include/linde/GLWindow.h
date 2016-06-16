@@ -2,7 +2,6 @@
 #define LINDE_GLWINDOW_H
 
 #include "lindeOpenGL.h"
-#include "GUIElements.h"
 
 #include <functional>
 
@@ -32,6 +31,7 @@ class VertexBufferObject;
 class FrameBufferObject;
 class FrameBufferObjectMultisample;
 class ShaderStorageBufferObject;
+class TextRenderer;
 
 /**
      * @brief The GLWindow class
@@ -48,16 +48,13 @@ class GLWindow
     friend class ShaderStorageBufferObject;
 
 
-    GLFWwindow		*									m_glfwWindow;
-    TextRenderer	*									m_textRenderer;
-    GUI_stuff											m_gui;
+    std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>	m_glfwWindow;
+    std::unique_ptr<TextRenderer>   					m_textRenderer;
 
-    std::vector<std::weak_ptr<AbstractShader> >			m_shaders;
+    std::vector<std::unique_ptr<AbstractShader> >		m_shaders;
 
-    std::shared_ptr<ProgressBar>						m_progressBar;
-
-    std::function<void ()>								m_renderFunction;
-	std::function<void (GLint, GLint, GLint, GLint)>	m_onKeyFunction;
+    std::function<void()>								m_renderFunction;
+    std::function<void(GLint, GLint, GLint, GLint)>     m_onKeyFunction;
 	std::function<void(GLint, GLint, GLint)>			m_onMouseFunction;
 	std::function<void(GLdouble, GLdouble)>				m_onMouseMoveFunction;
 	std::function<void(GLdouble, GLdouble)>				m_onScrollFunction;
@@ -136,21 +133,21 @@ public:
     void setVisible(GLboolean show);
     void resize(GLuint width, GLuint height);
 
-    void clearGUI();
-
-    GLboolean isGUIActive() const;
-
     GLint getWidth() const;
     GLint getHeight() const;
-    void getSize(GLint & width, GLint & height) const;
-    glm::vec2 getCursorPos() const;
-    int getMouseButtonState(int button) const;
+
+    void
+    getSize(GLint & width, GLint & height) const;
+
+    glm::vec2
+    getCursorPos() const;
+
+    int
+    getMouseButtonState(int button) const;
 
     GLboolean shouldClose();
 
     void makeContextCurrent() const;
-
-    std::shared_ptr<ProgressBar> & getProgressBar();
 
     void renderText(
             const std::string & text,
@@ -158,17 +155,6 @@ public:
             const glm::vec4 & color = glm::vec4(0.f, 0.f, 0.f, 1.f),
             GLint fontSize = 12);
 
-    template <typename T>
-    std::shared_ptr<Slider<T> >								addSlider(const std::string & text,
-															          T minValue, T maxValue, T * value);
-    std::shared_ptr<Label>									addLabel(const std::string & text);
-    std::shared_ptr<CheckBox>								addCheckBox(const std::string & text,
-															            bool * checked);
-    std::shared_ptr<DropDownBox>							addDropDownBox(const std::string & text,
-															               const std::vector<std::string> & options,
-															               int * selection, const std::function<void(int)> & callback);
-    std::shared_ptr<Button>									addButton(const std::string & text,
-															          const std::function<void()> &  callback);
 
     std::shared_ptr<Texture>								createTexture(GLsizei width, GLsizei height,
 															      GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
@@ -189,9 +175,9 @@ public:
 	std::shared_ptr<TextureMultisample>						createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples,
 															GLenum internalFormat = GL_RGBA, GLboolean fixedSampleLocation = GL_FALSE);
 
-    std::shared_ptr<Shader>									createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
-    std::shared_ptr<Shader>									createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
-    std::shared_ptr<ComputeShader>							createComputeShader(const std::string &source);
+    Shader*                                                 createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
+    Shader*                                                 createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
+    ComputeShader*                                          createComputeShader(const std::string &source);
     std::shared_ptr<VertexBufferObject>						createVertexBufferObject();
     std::shared_ptr<FrameBufferObject>					    createFramebufferObject();
 	std::shared_ptr<FrameBufferObjectMultisample>           createFramebufferObjectMultisample();
@@ -209,37 +195,6 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-template <typename T>
-std::shared_ptr<Slider<T> > GLWindow::addSlider(const std::string & text, T minValue, T maxValue, T * value)
-{
-    makeContextCurrent();
-
-    std::shared_ptr<Slider<T> > slider = std::make_shared<Slider<T> >(
-                this,
-                m_gui.m_nextAvailablePosition[0],
-            m_gui.m_nextAvailablePosition[1],
-            m_gui.m_sliderWidth,
-            m_gui.m_elementHeight,
-            minValue, maxValue, value);
-
-    slider->setText(text);
-    slider->setColor(m_gui.m_overlayColor);
-    m_gui.m_elements.push_back(slider);
-
-    m_gui.m_nextAvailablePosition[1] += GUIElement::GUI_DISPLACEMENT_FACTOR * m_gui.m_elementHeight;
-
-    return slider;
-}
-
-
-
-// explicit instantiations
-template class Slider<int>;
-template class Slider<uint>;
-template class Slider<float>;
-template class Slider<double>;
 
 } // namespace
 

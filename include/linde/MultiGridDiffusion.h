@@ -16,9 +16,9 @@ class GPU_MultiGridDiffusion
 {
     int                             m_nSmooth;
     std::shared_ptr<GLWindow>       m_glwindow;
-    std::shared_ptr<ComputeShader>  m_jacobiShader;
-    std::shared_ptr<ComputeShader>  m_restrictShader;
-    std::shared_ptr<ComputeShader>  m_prolongationShader;
+    ComputeShader*                  m_jacobiShader;
+    ComputeShader*                  m_restrictShader;
+    ComputeShader*                  m_prolongationShader;
     int                             m_steps;
 
 

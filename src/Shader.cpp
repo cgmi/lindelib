@@ -15,14 +15,12 @@
 namespace linde
 {
 
-const std::chrono::milliseconds AbstractShader::REFRESH_DELAY = std::chrono::milliseconds(1000);
 
 AbstractShader::AbstractShader() :
-    m_watch(),
     m_progHandle(0)
 {
     if (!m_progHandle)
-        m_progHandle = glCreateProgram();   
+        m_progHandle = glCreateProgram();
 }
 
 AbstractShader::~AbstractShader()
@@ -82,15 +80,6 @@ const GLchar * AbstractShader::readFile(const std::string & filename) const
 GLuint AbstractShader::getProgHandle() const
 {
     return m_progHandle;
-}
-
-void AbstractShader::checkShaderReload()
-{
-    if (m_watch.elapsedMilliseconds() >= REFRESH_DELAY)
-    {
-        m_watch.restart();
-        checkShaderChanged();
-    }
 }
 
 GLuint AbstractShader::getCurrentlyBoundProgram() const

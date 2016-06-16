@@ -746,7 +746,7 @@ void StructureTensorField::smoothBilateral(int iterations, float sigmaSpatial, f
 {
     if (window) // if OpenGL context available
     {
-        std::shared_ptr<ComputeShader> smoothingShader = window->createComputeShader("shaders/lindeLibShaders/TensorSmoothing.glsl");
+        ComputeShader * smoothingShader = window->createComputeShader("shaders/lindeLibShaders/TensorSmoothing.glsl");
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
