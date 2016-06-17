@@ -51,14 +51,12 @@ class GLWindow
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>	m_glfwWindow;
     std::unique_ptr<TextRenderer>   					m_textRenderer;
 
-    std::vector<std::unique_ptr<AbstractShader> >		m_shaders;
-
     std::function<void()>								m_renderFunction;
     std::function<void(GLint, GLint, GLint, GLint)>     m_onKeyFunction;
-	std::function<void(GLint, GLint, GLint)>			m_onMouseFunction;
-	std::function<void(GLdouble, GLdouble)>				m_onMouseMoveFunction;
-	std::function<void(GLdouble, GLdouble)>				m_onScrollFunction;
-	std::function<void(GLint, GLint)>					m_onResizeFunction;
+    std::function<void(GLint, GLint, GLint)>			m_onMouseFunction;
+    std::function<void(GLdouble, GLdouble)>				m_onMouseMoveFunction;
+    std::function<void(GLdouble, GLdouble)>				m_onScrollFunction;
+    std::function<void(GLint, GLint)>					m_onResizeFunction;
 
 public:
     GLWindow(GLuint width, GLuint height, const std::string & name = "window",
@@ -95,33 +93,30 @@ private:
     void internalOnKey(GLint key, GLint scancode, GLint action, GLint mods);
     void internalOnMouse(GLint button, GLint action, GLint mods);
     void internalOnMouseMove(GLdouble x, GLdouble y);
-	void internalOnScroll(GLdouble xo, GLdouble yo);
-	void internalOnResize(GLint width, GLint height);
+    void internalOnScroll(GLdouble xo, GLdouble yo);
+    void internalOnResize(GLint width, GLint height);
 
     void waitEvents() const;
     void swapBuffers() const;
-    void renderGUI();
 
-protected:
     GLFWwindow * getGLFW();
 
 public:
     // only poll and process events from the OS
     void pollEvents() const;
-    // swap buffers, paint gui and progress, processing events
+    // swap buffers, processing events
     void update(bool waitForEvents = false);
-    void toggleGUI(bool show);
 
-	// setting a custom onKey function
-	void setOnKeyFunction(const std::function<void(GLint, GLint, GLint, GLint)> & onKey);
-	// setting a custom onMouse function
-	void setOnMouseFunction(const std::function<void(GLint, GLint, GLint)> &onMouse);
-	// setting a custom onMouseMove function
-	void setOnMouseMoveFunction(const std::function<void(GLdouble, GLdouble)> &onMouseMove);
-	// setting a custom onScroll function
-	void setOnScrollFunction(const std::function<void(GLdouble, GLdouble)> &onScroll);
-	// setting a custom onResize function
-	void setOnResizeFunction(const std::function<void(GLint, GLint)> &onResize);
+    // setting a custom onKey function
+    void setOnKeyFunction(const std::function<void(GLint, GLint, GLint, GLint)> & onKey);
+    // setting a custom onMouse function
+    void setOnMouseFunction(const std::function<void(GLint, GLint, GLint)> &onMouse);
+    // setting a custom onMouseMove function
+    void setOnMouseMoveFunction(const std::function<void(GLdouble, GLdouble)> &onMouseMove);
+    // setting a custom onScroll function
+    void setOnScrollFunction(const std::function<void(GLdouble, GLdouble)> &onScroll);
+    // setting a custom onResize function
+    void setOnResizeFunction(const std::function<void(GLint, GLint)> &onResize);
     // setting the render function to be called by renderOnce
     void setRenderFunction(const std::function<void()> & renderStep);
 
@@ -157,30 +152,31 @@ public:
 
 
     std::shared_ptr<Texture>								createTexture(GLsizei width, GLsizei height,
-															      GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
-															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                          GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
+                                                                          GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                                                                          GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
     std::shared_ptr<Texture>								createTexture(const cv::Mat_<glm::vec3> & source,
-															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                          GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                                                                          GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
     std::shared_ptr<Texture>								createTexture(const cv::Mat_<glm::vec4> & source,
-															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                          GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                                                                          GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
     std::shared_ptr<Texture>								createTexture(const cv::Mat_<float> & source,
-															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                          GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                                                                          GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
     std::shared_ptr<Texture>								createTexture(const cv::Mat_<uchar> & source,
-															      GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-															      GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-	std::shared_ptr<TextureMultisample>						createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples,
-															GLenum internalFormat = GL_RGBA, GLboolean fixedSampleLocation = GL_FALSE);
+                                                                          GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                                                                          GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+    std::shared_ptr<TextureMultisample>						createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples,
+                                                                                     GLenum internalFormat = GL_RGBA, GLboolean fixedSampleLocation = GL_FALSE);
 
-    Shader*                                                 createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
-    Shader*                                                 createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
-    ComputeShader*                                          createComputeShader(const std::string &source);
+    std::shared_ptr<Shader>                                 createPipelineShader(const std::string &vertexSource, const std::string &fragSource);
+    std::shared_ptr<Shader>                                 createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource);
+    std::shared_ptr<ComputeShader>                          createComputeShader(const std::string &source);
+
     std::shared_ptr<VertexBufferObject>						createVertexBufferObject();
     std::shared_ptr<FrameBufferObject>					    createFramebufferObject();
-	std::shared_ptr<FrameBufferObjectMultisample>           createFramebufferObjectMultisample();
+    std::shared_ptr<FrameBufferObjectMultisample>           createFramebufferObjectMultisample();
     std::shared_ptr<ShaderStorageBufferObject>				createShaderStoragebufferObject();
 };
 

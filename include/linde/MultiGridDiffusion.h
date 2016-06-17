@@ -15,17 +15,17 @@ class ComputeShader;
 class GPU_MultiGridDiffusion
 {
     int                             m_nSmooth;
-    std::shared_ptr<GLWindow>       m_glwindow;
-    ComputeShader*                  m_jacobiShader;
-    ComputeShader*                  m_restrictShader;
-    ComputeShader*                  m_prolongationShader;
+    GLWindow*                       m_glwindow;
+    std::shared_ptr<ComputeShader>  m_jacobiShader;
+    std::shared_ptr<ComputeShader>  m_restrictShader;
+    std::shared_ptr<ComputeShader>  m_prolongationShader;
     int                             m_steps;
 
 
     GPU_MultiGridDiffusion();
 
 public:
-    GPU_MultiGridDiffusion(const std::shared_ptr<linde::GLWindow> & window);
+    GPU_MultiGridDiffusion(GLWindow* window);
     ~GPU_MultiGridDiffusion();
 
     // alpha channel is constraint mask

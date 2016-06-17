@@ -746,7 +746,7 @@ void StructureTensorField::smoothBilateral(int iterations, float sigmaSpatial, f
 {
     if (window) // if OpenGL context available
     {
-        ComputeShader * smoothingShader = window->createComputeShader("shaders/lindeLibShaders/TensorSmoothing.glsl");
+        std::shared_ptr<ComputeShader> smoothingShader = window->createComputeShader("shaders/lindeLibShaders/TensorSmoothing.glsl");
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
@@ -893,7 +893,7 @@ void StructureTensorField::smoothBilateral(int iterations, float sigmaSpatial, f
 }
 
 
-void StructureTensorField::interpolate(float minValidGradient, const std::shared_ptr<GLWindow> & gl)
+void StructureTensorField::interpolate(float minValidGradient, GLWindow* gl)
 {
     cv::Mat_<glm::vec4> psi(rows, cols);
     cv::Mat_<uchar> m(rows, cols);
@@ -980,7 +980,7 @@ void StructureTensorField::RungeKutta4_MaxEigenvector(const StructureTensorField
 
 
 // interpolates values!!!! leq threshold
-StructureTensorField StructureTensorField::computeStructureTensorField(const std::shared_ptr<GLWindow> & gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold)
+StructureTensorField StructureTensorField::computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold)
 {
     StructureTensorField tf;
 
@@ -993,7 +993,7 @@ StructureTensorField StructureTensorField::computeStructureTensorField(const std
 }
 
 
-StructureTensorField StructureTensorField::computeStructureTensorField(const std::shared_ptr<GLWindow> & gl, const cv::Mat_<glm::vec3> & input_image, const cv::Mat_<uchar> & mask, float inner_sigma, float outer_sigma, float threshold)
+StructureTensorField StructureTensorField::computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, const cv::Mat_<uchar> & mask, float inner_sigma, float outer_sigma, float threshold)
 {
     StructureTensorField tf;
 

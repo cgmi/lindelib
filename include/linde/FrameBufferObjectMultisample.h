@@ -41,8 +41,8 @@ class FrameBufferObjectMultisample
 
     GLboolean checkStatus();
 
-	FrameBufferObjectMultisample(GLint filtering = GL_NEAREST);
 public:
+    FrameBufferObjectMultisample(GLint filtering = GL_NEAREST);
     ~FrameBufferObjectMultisample();
 
 	GLuint id() const;

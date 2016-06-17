@@ -40,8 +40,8 @@ class FrameBufferObject
 
     GLboolean checkStatus();
 
-    FrameBufferObject();
 public:
+    FrameBufferObject();
     ~FrameBufferObject();
 
 	GLuint id() const;

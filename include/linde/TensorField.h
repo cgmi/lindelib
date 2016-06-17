@@ -164,13 +164,13 @@ public:
     void smoothBilateral(int iterations, float sigmaSpatial, float sigmaColor, const cv::Mat_<glm::vec3> & colorSource, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>(), GLWindow *window = nullptr);
 
     // interpolate all values smaller equal to minValidGradient (values bertween 0...1)
-    void interpolate(float minValidGradient, const std::shared_ptr<GLWindow> &gl);
+    void interpolate(float minValidGradient, GLWindow *gl);
 
     static
-    StructureTensorField computeStructureTensorField(const std::shared_ptr<GLWindow> &gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold);
+    StructureTensorField computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold);
 
     static
-    StructureTensorField computeStructureTensorField(const std::shared_ptr<GLWindow> & gl, const cv::Mat_<glm::vec3> &input_image, const cv::Mat_<uchar> &mask, float inner_sigma, float outer_sigma, float threshold);
+    StructureTensorField computeStructureTensorField(GLWindow *gl, const cv::Mat_<glm::vec3> &input_image, const cv::Mat_<uchar> &mask, float inner_sigma, float outer_sigma, float threshold);
     static
     StructureTensorField createFixedStructureTensorField(const cv::Size & size, const StructureTensor2x2 & tensor);
 

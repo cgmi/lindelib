@@ -13,8 +13,8 @@ namespace linde
         friend class GLWindow;
 		GLuint m_handle;
 
-        ShaderStorageBufferObject();
 	public:
+        ShaderStorageBufferObject();
         ~ShaderStorageBufferObject();
 
 		// retun current buffer size in bytes

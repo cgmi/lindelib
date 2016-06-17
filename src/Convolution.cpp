@@ -102,7 +102,7 @@ GPU_Convolution::GPU_Convolution() :
 
 }
 
-GPU_Convolution::GPU_Convolution(const std::shared_ptr<GLWindow> &window) :
+GPU_Convolution::GPU_Convolution(GLWindow *window) :
     m_window(window)
 {
     m_shader = m_window->createComputeShader("shaders/lindeLibShaders/SpatialConvolution.glsl");

@@ -254,12 +254,12 @@ class Texture;
 
 class GPU_Convolution
 {
-    std::shared_ptr<GLWindow>   m_window;
-    ComputeShader*              m_shader;
+    GLWindow*                       m_window;
+    std::shared_ptr<ComputeShader>  m_shader;
 
     GPU_Convolution();
 public:
-    GPU_Convolution(const std::shared_ptr<GLWindow> & window);
+    GPU_Convolution(GLWindow*  window);
     ~GPU_Convolution();
 
     void operator()(const cv::Mat_<float> & source, cv::Mat_<float> & output, const cv::Mat_<float> & kernel, const cv::Mat_<uchar> & mask);

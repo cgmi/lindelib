@@ -41,6 +41,7 @@ list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/Histogram.h
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/PaintComposer.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/ResourceHandler.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/KubelkaMunk.h)
+list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/GLContext.h)
 
 # add my sources to project
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Interpolation.cpp)
@@ -67,6 +68,7 @@ list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/PaintComposer.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Histogram.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/ResourceHandler.cpp)
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/KubelkaMunk.cpp)
+list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/GLContext.cpp)
 
 # OpenGL
 find_package(OpenGL REQUIRED)

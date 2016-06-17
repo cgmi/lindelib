@@ -21,10 +21,10 @@ class TextureMultisample
     friend class GLWindow;
     friend class FrameBufferObject;
 
+public:
 	TextureMultisample();
 	TextureMultisample(GLsizei width, GLsizei height, GLsizei numSamples, GLint internalFormat = GL_RGBA, GLboolean fixedSampleLocations = false, GLint envMode = GL_REPLACE);
 
-public:
 
     ~TextureMultisample();
 

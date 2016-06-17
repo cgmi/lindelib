@@ -20,26 +20,24 @@ class Texture
     friend class GLWindow;
     friend class FrameBufferObject;
 
+public:
     Texture();
     Texture(GLsizei width, GLsizei height,
-        GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
-        GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-        GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
-
-public:
-
+            GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
+            GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+            GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
     ~Texture();
 
-	void bind();
-	// used for binding at shader location for write andor read operations, acess:: GL_READ_ONLY, GL_WRITE_ONLY, or GL_READ_WRITE
-	void bindLocationUnit(GLuint unit, GLenum access = GL_READ_WRITE, GLint level = 0, GLboolean layered = GL_TRUE, GLint layer = 0);
+    void bind();
+    // used for binding at shader location for write andor read operations, acess:: GL_READ_ONLY, GL_WRITE_ONLY, or GL_READ_WRITE
+    void bindLocationUnit(GLuint unit, GLenum access = GL_READ_WRITE, GLint level = 0, GLboolean layered = GL_TRUE, GLint layer = 0);
     void unbind();
     void create(void* data = nullptr);
     void upload(void* data);
     void update(GLsizei width, GLsizei height,
-        GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
-        GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-        GLint envMode = GL_REPLACE, GLfloat wrapMode = GL_REPEAT);
+                GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
+                GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
+                GLint envMode = GL_REPLACE, GLfloat wrapMode = GL_REPEAT);
 
     void setWrapMode(GLfloat wrap);
     void setEnvMode(GLint envMode);
@@ -54,7 +52,7 @@ public:
     GLuint width() const { return m_width; }
     GLuint height() const { return m_height; }
 
-	GLboolean isCreated() const { return m_created; }
+    GLboolean isCreated() const { return m_created; }
 
     GLint getInternalFormat() const;
 
@@ -92,7 +90,7 @@ private:
     GLfloat m_maxAnisotropy;
     GLboolean m_manualMipMaps;
 
-	GLboolean m_created;
+    GLboolean m_created;
 };
 
 }// namespace linde

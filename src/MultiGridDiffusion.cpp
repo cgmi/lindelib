@@ -17,7 +17,7 @@ GPU_MultiGridDiffusion::GPU_MultiGridDiffusion():
 {
 }
 
-GPU_MultiGridDiffusion::GPU_MultiGridDiffusion(const std::shared_ptr<linde::GLWindow> &window) :
+GPU_MultiGridDiffusion::GPU_MultiGridDiffusion(GLWindow* window) :
     GPU_MultiGridDiffusion()
 {
     m_glwindow = window;
