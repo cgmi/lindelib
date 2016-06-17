@@ -1,5 +1,4 @@
 #include "../include/linde/Texture.h"
-#include "../include/linde/GLWindow.h"
 
 namespace linde
 {

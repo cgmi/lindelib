@@ -1,7 +1,7 @@
 #ifndef LINDE_VBO_H
 #define LINDE_VBO_H
 
-#include "GLWindow.h"
+#include "lindeOpenGL.h"
 
 
 namespace linde
@@ -32,7 +32,6 @@ namespace linde
 */
 class VertexBufferObject
 {
-    friend class GLWindow;
 public:
     struct DATA
     {

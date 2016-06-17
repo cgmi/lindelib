@@ -1,15 +1,11 @@
 #ifndef LINDE_TEXTURE_MULTISAMPLING_H
 #define LINDE_TEXTURE_MULTISAMPLING_H
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include "linde.h"
+#include "lindeOpenGL.h"
 
 namespace linde
 {
 
-class GLWindow;
 class FrameBufferObject;
 
 /**
@@ -18,7 +14,6 @@ class FrameBufferObject;
 */
 class TextureMultisample
 {
-    friend class GLWindow;
     friend class FrameBufferObject;
 
 public:

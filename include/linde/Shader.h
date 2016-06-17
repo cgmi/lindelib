@@ -3,9 +3,8 @@
 
 // glsl graphics pipeline shader, and compute shader
 
-#include "GLWindow.h"
 #include "Stopwatch.h"
-
+#include "lindeOpenGL.h"
 
 #define SHADER_CHECK
 
@@ -75,8 +74,6 @@ private:
 
 class Shader : public AbstractShader
 {
-    friend class GLWindow;
-
 protected:
 
     long int	m_vfileWriteTime;
@@ -135,7 +132,6 @@ public:
     */
 class ComputeShader : public AbstractShader
 {
-     friend class GLWindow;
 
 protected:
 

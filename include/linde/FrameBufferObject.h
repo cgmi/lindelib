@@ -1,16 +1,12 @@
 #ifndef LINDE_FBO_H
 #define LINDE_FBO_H
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include "linde.h"
+#include "lindeOpenGL.h"
 
 namespace linde
 {
 
 class Texture;
-class GLWindow;
 
 /*
 #################################################################################
@@ -32,8 +28,6 @@ class GLWindow;
 */
 class FrameBufferObject
 {
-    friend class GLWindow;
-
     GLuint                      m_handle;
     std::shared_ptr<Texture>    m_target;
     std::shared_ptr<Texture>    m_depth;

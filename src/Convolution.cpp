@@ -1,5 +1,5 @@
 #include "../include/linde/Convolution.h"
-#include "../include/linde/GLWindow.h"
+#include "../include/linde/GLContext.h"
 #include "../include/linde/Shader.h"
 #include "../include/linde/Texture.h"
 
@@ -96,16 +96,16 @@ cv::Mat_<double> createGaborKernel(cv::Size ksize, double sigma, double theta,
 //}
 
 GPU_Convolution::GPU_Convolution() :
-    m_window(nullptr),
+    m_context(nullptr),
     m_shader(nullptr)
 {
 
 }
 
-GPU_Convolution::GPU_Convolution(GLWindow *window) :
-    m_window(window)
+GPU_Convolution::GPU_Convolution(GLContext *context) :
+    m_context(context)
 {
-    m_shader = m_window->createComputeShader("shaders/lindeLibShaders/SpatialConvolution.glsl");
+    m_shader = m_context->createComputeShader("shaders/lindeLibShaders/SpatialConvolution.glsl");
 }
 
 GPU_Convolution::~GPU_Convolution()
@@ -119,10 +119,10 @@ void GPU_Convolution::operator()(const cv::Mat_<float> & source, cv::Mat_<float>
     output.create(source.size());
     output.setTo(0.f);
 
-    std::shared_ptr<Texture> sourceTexture = m_window->createTexture(source);
-    std::shared_ptr<Texture> outTexture = m_window->createTexture(output);
-    std::shared_ptr<Texture> kernelTexture = m_window->createTexture(kernel);
-    std::shared_ptr<Texture> maskTexture = m_window->createTexture(mask);
+    std::shared_ptr<Texture> sourceTexture = m_context->createTexture(source);
+    std::shared_ptr<Texture> outTexture = m_context->createTexture(output);
+    std::shared_ptr<Texture> kernelTexture = m_context->createTexture(kernel);
+    std::shared_ptr<Texture> maskTexture = m_context->createTexture(mask);
 
     this->operator ()(sourceTexture, outTexture, kernelTexture, maskTexture);
 

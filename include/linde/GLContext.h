@@ -37,32 +37,25 @@ class TextRenderer;
      */
 class GLContext
 {
-
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)>	m_glfwWindow;
     std::unique_ptr<TextRenderer>   					m_textRenderer;
-
-public:
-    GLContext();
-
-    virtual ~GLContext();
-
-private:
 
     void initGLFW();
     void initGLEW(GLFWwindow* window);
 
-    void createWindow(GLuint width, GLuint height, const std::string & name = "window",
-                      GLint redBits = 32, GLint greenBits = 32, GLint blueBits = 32, GLint alphaBits = 32,
-                      GLint depthBits = 64, GLint stencilBits = 16, GLuint samples = 4,
-                      GLboolean resizable = true,
-                      GLboolean visible = true,
-                      GLboolean sRGB_capable = true,
-                      GLFWmonitor * monitor = nullptr, GLFWwindow * shareContext = nullptr);
+protected:
+    GLFWwindow *getGLFW() const;
 
-
-    GLFWwindow * getGLFW();
+    GLContext(GLuint width, GLuint height, const std::string & name,
+              GLint redBits, GLint greenBits, GLint blueBits, GLint alphaBits,
+              GLint depthBits, GLint stencilBits, GLuint samples,
+              GLboolean resizable, GLboolean visible, GLboolean sRGB_capable,
+              GLFWmonitor * monitor, GLFWwindow * shareContext);
 
 public:
+    GLContext();
+    virtual ~GLContext();
+
     static
     void onError(GLint errorCode, const char* errorMessage);
 

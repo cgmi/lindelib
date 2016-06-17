@@ -8,7 +8,7 @@
 #include "../include/linde/Texture.h"
 #include "../include/linde/Diffusion.h"
 #include "../include/linde/ShaderStorageBuffer.h"
-#include "../include/linde/GLWindow.h"
+#include "../include/linde/GLContext.h"
 #include "../include/linde/MultiGridDiffusion.h"
 
 #include <fstream>
@@ -735,165 +735,7 @@ StructureTensorField StructureTensorField::clone() const
     return clone;
 }
 
-
-
-void StructureTensorField::smoothDiffusion(int iterations, float kappa, const cv::Mat_<uchar> & mask)
-{
-
-}
-
-void StructureTensorField::smoothBilateral(int iterations, float sigmaSpatial, float sigmaColor, const cv::Mat_<glm::vec3> & colorSource, const cv::Mat_<uchar> & mask, GLWindow *window)
-{
-    if (window) // if OpenGL context available
-    {
-        std::shared_ptr<ComputeShader> smoothingShader = window->createComputeShader("shaders/lindeLibShaders/TensorSmoothing.glsl");
-
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-
-        for (int it = 0; it < iterations; it++)
-        {
-            // upload tensors
-            std::shared_ptr<Texture> tensorTex = window->createTexture(m_tensors.cols, m_tensors.rows, GL_RGB32F, GL_RGB, GL_FLOAT, GL_LINEAR, GL_LINEAR,
-                                                                       GL_MIRRORED_REPEAT, GL_MIRRORED_REPEAT);
-
-            cv::Mat_<StructureTensor2x2> tCpy;
-            cv::flip(m_tensors, tCpy, 0);
-            tensorTex->create(tCpy.data);
-
-            // output tensors
-            std::shared_ptr<ShaderStorageBufferObject> outputBuffer = window->createShaderStoragebufferObject();
-            outputBuffer->create(nullptr, m_tensors.cols*m_tensors.rows *sizeof(glm::vec4));
-
-            // upload color source and mask as alpha
-            cv::Mat_<glm::vec4> colorSourceUpload(colorSource.size());
-            for (int i = 0; i < colorSource.rows*colorSource.cols; i++)
-            {
-                colorSourceUpload(i).x = colorSource(i).x;
-                colorSourceUpload(i).y = colorSource(i).y;
-                colorSourceUpload(i).z = colorSource(i).z;
-                colorSourceUpload(i).w = (mask.data) ? mask(i) : 255;
-            }
-            std::shared_ptr<Texture> colorTex = window->createTexture(colorSourceUpload.cols, colorSourceUpload.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_LINEAR, GL_LINEAR,
-                                                                      GL_MIRRORED_REPEAT, GL_MIRRORED_REPEAT);
-            cv::flip(colorSourceUpload, colorSourceUpload, 0);
-            colorTex->create(colorSourceUpload.data);
-
-            smoothingShader->bind(true);
-            outputBuffer->bindBase(0);
-            glActiveTexture(GL_TEXTURE0);
-            tensorTex->bind();
-            smoothingShader->seti("inputTensors", 0);
-            glActiveTexture(GL_TEXTURE1);
-            colorTex->bind();
-            smoothingShader->seti("colorSource", 1);
-            smoothingShader->setf("sigmaSpatial", sigmaSpatial);
-            smoothingShader->seti("radius", gaussKernelRadiusFromSigma(sigmaSpatial));
-            smoothingShader->setf("sigmaColor", sigmaColor);
-            glm::vec3 workSize = smoothingShader->getWorkGroupSize();
-            smoothingShader->dispatchCompute(tensorTex->width() / workSize.x + 1, tensorTex->height() / workSize.y + 1, 1);
-            smoothingShader->memoryBarrier();
-            smoothingShader->bind(false);
-
-            cv::Mat_<glm::vec4> bufferTemp(m_tensors.size());
-            outputBuffer->download(bufferTemp.data, m_tensors.cols*m_tensors.rows *sizeof(glm::vec4));
-            cv::flip(bufferTemp, bufferTemp, 0);
-            for (int i = 0; i < m_tensors.rows*m_tensors.cols; i++)
-            {
-                m_tensors(i).E = bufferTemp(i).x;
-                m_tensors(i).F = bufferTemp(i).y;
-                m_tensors(i).G = bufferTemp(i).z;
-            }
-        }
-
-        glPopClientAttrib();
-        glPopAttrib();
-
-    }
-    else
-    {
-        const int width = cols;
-        const int height = rows;
-
-        const int size = gaussKernelSizeFromSigma(sigmaSpatial);
-        const int r = (size - 1) / 2;
-
-        for (int it = 0; it < iterations; it++)
-        {
-
-            cv::Mat_<StructureTensor2x2> tCpy(height, width);
-
-            // create gauss kernel as distance weights
-            cv::Mat_<float> gaussKernel(size, size, 0.0);
-            for (int k = -r; k <= r; ++k)
-            {
-                for (int l = -r; l <= r; ++l)
-                {
-                    gaussKernel(k + r, l + r) = gauss<float>(static_cast<float>(l), static_cast<float>(k), sigmaSpatial);
-                }
-            }
-
-            // run the filter
-            linde::parallel_for(0, height, [&](int y)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    float E = 0.0;
-                    float F = 0.0;
-                    float G = 0.0;
-                    float Ew = 0.0;
-                    float Fw = 0.0;
-                    float Gw = 0.0;
-
-                    int i_, j_;
-                    float weight;
-                    float colorW;
-
-                    glm::vec3 c0 = colorSource(y, x);
-                    glm::vec3 c1;
-
-                    if (mask.data && mask(y, x) == 0) continue;
-
-                    for (int j = -r; j <= r; ++j)
-                    {
-                        for (int i = -r; i <= r; ++i)
-                        {
-                            i_ = cv::borderInterpolate(y + i, height, cv::BORDER_REFLECT);
-                            j_ = cv::borderInterpolate(x + j, width, cv::BORDER_REFLECT);
-
-                            if (mask.data && mask(i_, j_) == 0) continue;
-
-                            const StructureTensor2x2 & tensor = m_tensors(i_, j_);
-
-                            c1 = colorSource(i_, j_);
-
-                            colorW = gauss<float>(glm::distance(c0, c1), sigmaColor);
-
-                            weight = gaussKernel(i + r, j + r) * colorW;
-
-                            //std::cout << "t0: " << t0 << " t1:" << t1 << std::endl;
-                            //std::cout << "tw: " << tensorW << " cw:" << colorW << std::endl;
-
-                            E += weight * tensor.E;
-                            F += weight * tensor.F;
-                            G += weight * tensor.G;
-
-                            Ew += weight;
-                            Fw += weight;
-                            Gw += weight;
-                        }
-                    }
-                    tCpy(y, x).set(E / Ew, F / Fw, G / Gw);
-                }
-            });
-
-            this->m_tensors = tCpy;
-        }
-    }
-}
-
-
-void StructureTensorField::interpolate(float minValidGradient, GLWindow* gl)
+void StructureTensorField::interpolate(float minValidGradient, GLContext* gl)
 {
     cv::Mat_<glm::vec4> psi(rows, cols);
     cv::Mat_<uchar> m(rows, cols);
@@ -980,7 +822,7 @@ void StructureTensorField::RungeKutta4_MaxEigenvector(const StructureTensorField
 
 
 // interpolates values!!!! leq threshold
-StructureTensorField StructureTensorField::computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold)
+StructureTensorField StructureTensorField::computeStructureTensorField(GLContext* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold)
 {
     StructureTensorField tf;
 
@@ -993,7 +835,7 @@ StructureTensorField StructureTensorField::computeStructureTensorField(GLWindow*
 }
 
 
-StructureTensorField StructureTensorField::computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, const cv::Mat_<uchar> & mask, float inner_sigma, float outer_sigma, float threshold)
+StructureTensorField StructureTensorField::computeStructureTensorField(GLContext* gl, const cv::Mat_<glm::vec3> & input_image, const cv::Mat_<uchar> & mask, float inner_sigma, float outer_sigma, float threshold)
 {
     StructureTensorField tf;
 

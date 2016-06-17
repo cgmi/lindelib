@@ -1,7 +1,6 @@
 #include "../include/linde/FrameBufferObjectMultisample.h"
 #include "../include/linde/FrameBufferObject.h"
 #include "../include/linde/TextureMultisample.h"
-#include "../include/linde/GLWindow.h"
 
 namespace linde
 {

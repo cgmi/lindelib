@@ -1,5 +1,5 @@
 #include "../include/linde/MultiGridDiffusion.h"
-#include "../include/linde/GLWindow.h"
+#include "../include/linde/GLContext.h"
 #include "../include/linde/Texture.h"
 #include "../include/linde/Shader.h"
 
@@ -9,7 +9,7 @@ namespace linde
 
 GPU_MultiGridDiffusion::GPU_MultiGridDiffusion():
     m_nSmooth(5),
-    m_glwindow(nullptr),
+    m_context(nullptr),
     m_jacobiShader(nullptr),
     m_restrictShader(nullptr),
     m_prolongationShader(nullptr),
@@ -17,14 +17,14 @@ GPU_MultiGridDiffusion::GPU_MultiGridDiffusion():
 {
 }
 
-GPU_MultiGridDiffusion::GPU_MultiGridDiffusion(GLWindow* window) :
+GPU_MultiGridDiffusion::GPU_MultiGridDiffusion(GLContext *context) :
     GPU_MultiGridDiffusion()
 {
-    m_glwindow = window;
+    m_context = context;
 
-    m_jacobiShader = m_glwindow->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_jacobi.glsl");
-    m_restrictShader = m_glwindow->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_restriction.glsl");
-    m_prolongationShader = m_glwindow->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_prolongation.glsl");
+    m_jacobiShader = m_context->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_jacobi.glsl");
+    m_restrictShader = m_context->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_restriction.glsl");
+    m_prolongationShader = m_context->createComputeShader("shaders/lindeLibShaders/MultiGridDiffusion_prolongation.glsl");
 }
 
 GPU_MultiGridDiffusion::~GPU_MultiGridDiffusion()
@@ -57,7 +57,7 @@ void GPU_MultiGridDiffusion::solve(cv::Mat_<glm::vec4> &psi_in)
     }
     psi_in.copyTo(psi(cv::Rect(0, 0, oSize.width, oSize.height)));
 
-    std::shared_ptr<Texture> m0 = m_glwindow->createTexture(psi.cols, psi.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_NEAREST, GL_NEAREST);
+    std::shared_ptr<Texture> m0 = m_context->createTexture(psi.cols, psi.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, GL_NEAREST, GL_NEAREST);
 
     cv::Mat_<glm::vec4> tempFlip;
     cv::flip(psi, tempFlip, 0);
@@ -66,11 +66,6 @@ void GPU_MultiGridDiffusion::solve(cv::Mat_<glm::vec4> &psi_in)
     for (int steps = 0; steps < m_steps; steps++)
     {
         vCycle(m0);
-
-//        m0->render(0, 0, m_glwindow->getWidth(), m_glwindow->getHeight());
-//        m_glwindow->update(true);
-
-        //std::cout << "vcycle iteration: " << steps << std::endl;
     }
     // get result from GPU
     m0->bind();
@@ -86,7 +81,7 @@ void GPU_MultiGridDiffusion::solve(cv::Mat_<glm::vec4> &psi_in)
 
 void GPU_MultiGridDiffusion::relaxation(std::shared_ptr<Texture> &m0, const int iterations) const
 {
-    std::shared_ptr<Texture> m1 = m_glwindow->createTexture(m0->width(), m0->height(), m0->getInternalFormat(),  m0->getFormat(),  m0->getType(), m0->getMinFilter(), m0->getMagFilter());
+    std::shared_ptr<Texture> m1 = m_context->createTexture(m0->width(), m0->height(), m0->getInternalFormat(),  m0->getFormat(),  m0->getType(), m0->getMinFilter(), m0->getMagFilter());
     m1->create(nullptr);
 
     m_jacobiShader->bind(true);
@@ -162,7 +157,7 @@ void GPU_MultiGridDiffusion::vCycle(std::shared_ptr<Texture> &u) const
     relaxation(u, lvl*m_nSmooth);
 
     // restriction
-    std::shared_ptr<Texture> U = m_glwindow->createTexture(Uw, Uh, u->getInternalFormat(),  u->getFormat(),  u->getType(), u->getMinFilter(), u->getMagFilter());
+    std::shared_ptr<Texture> U = m_context->createTexture(Uw, Uh, u->getInternalFormat(),  u->getFormat(),  u->getType(), u->getMinFilter(), u->getMagFilter());
     U->create(nullptr);
     restriction(u, U);
 

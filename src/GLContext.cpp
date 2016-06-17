@@ -14,22 +14,16 @@
 namespace linde
 {
 
-GLContext::GLContext()
-    :
-      m_glfwWindow(nullptr, nullptr),
-      m_textRenderer(nullptr)
+GLContext::GLContext() :
+    GLContext(640, 480, "",
+              8, 8, 8, 8,
+              8, 8, 4,
+              false,
+              false,
+              true,
+              nullptr,
+              nullptr)
 {
-    createWindow(640, 480, "",
-                 8, 8, 8, 8,
-                 8, 8, 4,
-                 false,
-                 false,
-                 true,
-                 nullptr,
-                 nullptr);
-
-
-    m_textRenderer = std::make_unique<TextRenderer>();
 
 }
 
@@ -76,11 +70,18 @@ void GLContext::initGLEW(GLFWwindow* window)
     }
 }
 
-void GLContext::createWindow(GLuint width, GLuint height, const std::string & name,
-                            GLint redBits, GLint greenBits, GLint blueBits, GLint alphaBits,
-                            GLint depthBits, GLint stencilBits, GLuint samples,
-                            GLboolean resizable, GLboolean visible, GLboolean sRGB_capable,
-                            GLFWmonitor * monitor, GLFWwindow * shareContext)
+GLFWwindow *GLContext::getGLFW() const
+{
+    return m_glfwWindow.get();
+}
+
+GLContext::GLContext(GLuint width, GLuint height, const std::string & name,
+                     GLint redBits, GLint greenBits, GLint blueBits, GLint alphaBits,
+                     GLint depthBits, GLint stencilBits, GLuint samples,
+                     GLboolean resizable, GLboolean visible, GLboolean sRGB_capable,
+                     GLFWmonitor * monitor, GLFWwindow * shareContext) :
+    m_glfwWindow(nullptr, nullptr),
+    m_textRenderer(nullptr)
 {
     initGLFW();
 
@@ -142,13 +143,6 @@ void GLContext::createWindow(GLuint width, GLuint height, const std::string & na
 }
 
 
-
-GLFWwindow * GLContext::getGLFW()
-{
-    return m_glfwWindow.get();
-}
-
-
 void GLContext::makeContextCurrent() const
 {
     GLFWwindow * current = glfwGetCurrentContext();
@@ -180,8 +174,8 @@ std::shared_ptr<Texture> GLContext::createTexture(GLsizei width, GLsizei height,
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec3> & source,
-                                                 GLint minFilter, GLint magFilter,
-                                                 GLint envMode, GLint wrapMode)
+                                                  GLint minFilter, GLint magFilter,
+                                                  GLint envMode, GLint wrapMode)
 {
     makeContextCurrent();
 
@@ -194,8 +188,8 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec3> & so
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec4> & source,
-                                                 GLint minFilter, GLint magFilter,
-                                                 GLint envMode, GLint wrapMode)
+                                                  GLint minFilter, GLint magFilter,
+                                                  GLint envMode, GLint wrapMode)
 {
     makeContextCurrent();
 
@@ -208,8 +202,8 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec4> & so
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<float> & source,
-                                                 GLint minFilter, GLint magFilter,
-                                                 GLint envMode, GLint wrapMode)
+                                                  GLint minFilter, GLint magFilter,
+                                                  GLint envMode, GLint wrapMode)
 {
     makeContextCurrent();
 
@@ -222,8 +216,8 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<float> & source
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<uchar> & source,
-                                                 GLint minFilter, GLint magFilter,
-                                                 GLint envMode, GLint wrapMode)
+                                                  GLint minFilter, GLint magFilter,
+                                                  GLint envMode, GLint wrapMode)
 {
     makeContextCurrent();
 

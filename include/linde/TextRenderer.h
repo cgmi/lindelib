@@ -2,7 +2,7 @@
 #define LINDE_TEXT_RENDERER_H
 
 
-#include "GLWindow.h"
+#include "lindeOpenGL.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

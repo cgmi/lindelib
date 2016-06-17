@@ -105,7 +105,8 @@ public:
 
 namespace linde
 {
-class GLWindow;
+
+class GLContext;
 
 
 class StructureTensorField
@@ -159,18 +160,14 @@ public:
 
     StructureTensorField clone() const;
 
-    // smooth according to radius
-    void smoothDiffusion(int iterations, float kappa, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>()); // anisotropic diffusion
-    void smoothBilateral(int iterations, float sigmaSpatial, float sigmaColor, const cv::Mat_<glm::vec3> & colorSource, const cv::Mat_<uchar> & mask = cv::Mat_<uchar>(), GLWindow *window = nullptr);
-
     // interpolate all values smaller equal to minValidGradient (values bertween 0...1)
-    void interpolate(float minValidGradient, GLWindow *gl);
+    void interpolate(float minValidGradient, GLContext *gl);
 
     static
-    StructureTensorField computeStructureTensorField(GLWindow* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold);
+    StructureTensorField computeStructureTensorField(GLContext* gl, const cv::Mat_<glm::vec3> & input_image, float inner_sigma, float outer_sigma, float threshold);
 
     static
-    StructureTensorField computeStructureTensorField(GLWindow *gl, const cv::Mat_<glm::vec3> &input_image, const cv::Mat_<uchar> &mask, float inner_sigma, float outer_sigma, float threshold);
+    StructureTensorField computeStructureTensorField(GLContext *gl, const cv::Mat_<glm::vec3> &input_image, const cv::Mat_<uchar> &mask, float inner_sigma, float outer_sigma, float threshold);
     static
     StructureTensorField createFixedStructureTensorField(const cv::Size & size, const StructureTensor2x2 & tensor);
 

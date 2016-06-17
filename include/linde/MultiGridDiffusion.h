@@ -7,7 +7,7 @@ namespace linde
 {
 // author Thomas Lindemeier
 
-class GLWindow;
+class GLContext;
 class Texture;
 class ComputeShader;
 
@@ -15,7 +15,7 @@ class ComputeShader;
 class GPU_MultiGridDiffusion
 {
     int                             m_nSmooth;
-    GLWindow*                       m_glwindow;
+    GLContext*                      m_context;
     std::shared_ptr<ComputeShader>  m_jacobiShader;
     std::shared_ptr<ComputeShader>  m_restrictShader;
     std::shared_ptr<ComputeShader>  m_prolongationShader;
@@ -25,7 +25,7 @@ class GPU_MultiGridDiffusion
     GPU_MultiGridDiffusion();
 
 public:
-    GPU_MultiGridDiffusion(GLWindow* window);
+    GPU_MultiGridDiffusion(GLContext* context);
     ~GPU_MultiGridDiffusion();
 
     // alpha channel is constraint mask

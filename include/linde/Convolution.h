@@ -249,17 +249,17 @@ void ComputeGaussDerivativeEnergy(const cv::Mat_<T> & source,
 
 
 class ComputeShader;
-class GLWindow;
+class GLContext;
 class Texture;
 
 class GPU_Convolution
 {
-    GLWindow*                       m_window;
+    GLContext*                       m_context;
     std::shared_ptr<ComputeShader>  m_shader;
 
     GPU_Convolution();
 public:
-    GPU_Convolution(GLWindow*  window);
+    GPU_Convolution(GLContext*  context);
     ~GPU_Convolution();
 
     void operator()(const cv::Mat_<float> & source, cv::Mat_<float> & output, const cv::Mat_<float> & kernel, const cv::Mat_<uchar> & mask);
