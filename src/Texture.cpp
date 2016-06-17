@@ -13,8 +13,9 @@ namespace linde
 #################################################################################
 #################################################################################
 */
-Texture::Texture()
-    : m_id(0),
+Texture::Texture(GLContext *glContext) :
+    GLObject(glContext),
+    m_id(0),
     m_width(0),
     m_height(0),
     m_target(GL_TEXTURE_2D),
@@ -36,11 +37,13 @@ Texture::Texture()
 }
 
 //Create empty texture
-Texture::Texture(GLsizei width, GLsizei height,
+Texture::Texture(GLContext * glContext,
+                 GLsizei width, GLsizei height,
     GLint internalFormat, GLenum format, GLint type,
     GLint minFilter, GLint magFilter,
-    GLint envMode, GLint wrapMode)
-    : m_id(0),
+    GLint envMode, GLint wrapMode) :
+    GLObject(glContext),
+    m_id(0),
     m_width(width),
     m_height(height),
     m_target(GL_TEXTURE_2D),

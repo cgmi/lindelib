@@ -5,7 +5,8 @@
 namespace linde
 {
 
-FrameBufferObjectMultisample::FrameBufferObjectMultisample(GLint filtering) :
+FrameBufferObjectMultisample::FrameBufferObjectMultisample(GLContext * glContext, GLint filtering) :
+    GLObject(glContext),
 	m_target(nullptr),
 	m_depth(nullptr),
 	m_filtering(filtering)

@@ -26,7 +26,7 @@ class Texture;
 * University of Konstanz-
 * Department for Computergraphics
 */
-class FrameBufferObject
+class FrameBufferObject : public GLObject
 {
     GLuint                      m_handle;
     std::shared_ptr<Texture>    m_target;
@@ -35,7 +35,7 @@ class FrameBufferObject
     GLboolean checkStatus();
 
 public:
-    FrameBufferObject();
+    FrameBufferObject(GLContext * glContext);
     ~FrameBufferObject();
 
 	GLuint id() const;

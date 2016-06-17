@@ -18,7 +18,8 @@ namespace linde
 */
 
 
-    TextRenderer::TextRenderer() :
+    TextRenderer::TextRenderer(GLContext *glContext) :
+        GLObject(glContext),
         m_fontSize(12),
         m_xscale(1.0f),
         m_yscale(1.0f),

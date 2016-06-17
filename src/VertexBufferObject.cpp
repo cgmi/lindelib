@@ -15,8 +15,8 @@ namespace linde
 #################################################################################
 */
 
-VertexBufferObject::VertexBufferObject()
-    :
+VertexBufferObject::VertexBufferObject(GLContext *glContext) :
+    GLObject(glContext),
     m_nrVertices(0),
     m_nrDynamicVertices(0),
     m_nrIndices(0),
@@ -184,66 +184,5 @@ GLuint VertexBufferObject::nrDynamicVertices() const
 {
     return m_nrDynamicVertices;
 }
-
-VertexBufferObject * VertexBufferObject::createQuad(const glm::vec2 &topLeft, const glm::vec2 &topRight,
-	const glm::vec2 &bottomRight, const glm::vec2 &bottomLeft,
-	float depth, const glm::vec4 &color)
-{
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec2> texCoords;
-
-	vertices.push_back(glm::vec3(topLeft[0], topLeft[1], depth));
-	vertices.push_back(glm::vec3(topRight[0], topRight[1], depth));
-	vertices.push_back(glm::vec3(bottomRight[0], bottomRight[1], depth));
-	vertices.push_back(glm::vec3(bottomLeft[0], bottomLeft[1], depth));
-
-	texCoords.push_back(glm::vec2(0.0f, 0.0f));
-	texCoords.push_back(glm::vec2(1.0f, 0.0f));
-	texCoords.push_back(glm::vec2(1.0f, 1.0f));
-	texCoords.push_back(glm::vec2(0.0f, 1.0f));
-
-    GLuint nrVertices = (GLuint)vertices.size();
-    VertexBufferObject::DATA *attrData = new VertexBufferObject::DATA[nrVertices];
-
-    for (uint i = 0; i<nrVertices; ++i)
-    {
-		glm::vec3 v = vertices[i];
-		glm::vec2 t = texCoords[i];
-
-        attrData[i].vx = v[0];
-        attrData[i].vy = v[1];
-        attrData[i].vz = v[2];
-        attrData[i].vw = 1.0f;
-
-        attrData[i].nx = 0.0f;
-        attrData[i].ny = 1.0f;
-        attrData[i].nz = 0.0f;
-        attrData[i].nw = 0.0f;
-
-        attrData[i].cx = color[0];
-        attrData[i].cy = color[1];
-        attrData[i].cz = color[2];
-        attrData[i].cw = color[3];
-
-        attrData[i].tx = t[0];
-        attrData[i].ty = t[1];
-        attrData[i].tz = 0.0f;
-        attrData[i].tw = 0.0f;
-    }
-
-    VertexBufferObject *vbo = new VertexBufferObject();
-    vbo->setData(attrData, GL_STATIC_DRAW, nrVertices, GL_QUADS);
-
-    vbo->addAttrib(VERTEX_POSITION);
-    vbo->addAttrib(VERTEX_NORMAL);
-    vbo->addAttrib(VERTEX_COLOR);
-    vbo->addAttrib(VERTEX_TEXTURE);
-    vbo->bindAttribs();
-
-    delete[] attrData;
-
-    return vbo;
-}
-
 
 } // namespace linde

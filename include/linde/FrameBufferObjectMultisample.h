@@ -27,7 +27,7 @@ class FrameBufferObject;
 * University of Konstanz-
 * Department for Computergraphics
 */
-class FrameBufferObjectMultisample
+class FrameBufferObjectMultisample : public GLObject
 {
     GLuint								   m_handle;
     std::shared_ptr<TextureMultisample>    m_target;
@@ -36,7 +36,7 @@ class FrameBufferObjectMultisample
     GLboolean checkStatus();
 
 public:
-    FrameBufferObjectMultisample(GLint filtering = GL_NEAREST);
+    FrameBufferObjectMultisample(GLContext * glContext, GLint filtering = GL_NEAREST);
     ~FrameBufferObjectMultisample();
 
 	GLuint id() const;

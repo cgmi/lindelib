@@ -1,25 +1,22 @@
 #ifndef LINDE_TEXTURE_MULTISAMPLING_H
 #define LINDE_TEXTURE_MULTISAMPLING_H
 
-#include "lindeOpenGL.h"
+#include "GLContext.h"
 
 namespace linde
 {
 
-class FrameBufferObject;
 
 /**
 * @author Marc Spicker, Thomas Lindemeier, Sören Pirk
 * @date 03.06.2016
 */
-class TextureMultisample
+class TextureMultisample : public GLObject
 {
-    friend class FrameBufferObject;
 
 public:
-	TextureMultisample();
-	TextureMultisample(GLsizei width, GLsizei height, GLsizei numSamples, GLint internalFormat = GL_RGBA, GLboolean fixedSampleLocations = false, GLint envMode = GL_REPLACE);
-
+    TextureMultisample(GLContext * glContext);
+    TextureMultisample(GLContext *glContext, GLsizei width, GLsizei height, GLsizei numSamples, GLint internalFormat = GL_RGBA, GLboolean fixedSampleLocations = false, GLint envMode = GL_REPLACE);
 
     ~TextureMultisample();
 

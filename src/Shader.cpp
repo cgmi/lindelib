@@ -16,7 +16,8 @@ namespace linde
 {
 
 
-AbstractShader::AbstractShader() :
+AbstractShader::AbstractShader(GLContext *glContext) :
+    GLObject(glContext),
     m_progHandle(0)
 {
     if (!m_progHandle)
@@ -177,8 +178,8 @@ void AbstractShader::setMatrix(const GLchar* label, const glm::mat3 &mat)
 
 
 
-Shader::Shader() :
-    AbstractShader(),
+Shader::Shader(GLContext *glContext) :
+    AbstractShader(glContext),
     m_vertProg(0),
     m_contProg(0),
     m_evalProg(0),
@@ -188,8 +189,8 @@ Shader::Shader() :
 
 }
 
-Shader::Shader(const std::string &vFileName, const std::string &fFileName) :
-    AbstractShader(),
+Shader::Shader(GLContext * glContext, const std::string &vFileName, const std::string &fFileName) :
+    AbstractShader(glContext),
     m_vertProg(0),
     m_contProg(0),
     m_evalProg(0),
@@ -201,8 +202,8 @@ Shader::Shader(const std::string &vFileName, const std::string &fFileName) :
     attachFragmentShader(fFileName);
 }
 
-Shader::Shader(const std::string &vFileName, const std::string &gFileName, const std::string &fFileName) :
-    AbstractShader(),
+Shader::Shader(GLContext * glContext, const std::string &vFileName, const std::string &gFileName, const std::string &fFileName) :
+    AbstractShader(glContext),
     m_vertProg(0),
     m_contProg(0),
     m_evalProg(0),
@@ -479,8 +480,8 @@ void Shader::bindAttribLocations()
     this->bindAttribLocation("Texture", VERTEX_TEXTURE);
 }
 
-ComputeShader::ComputeShader() :
-    AbstractShader(),
+ComputeShader::ComputeShader(GLContext * glContext) :
+    AbstractShader(glContext),
     m_filename(),
     m_fileWriteTime(-1)
 {
@@ -492,8 +493,8 @@ ComputeShader::~ComputeShader()
     cleanUp();
 }
 
-ComputeShader::ComputeShader(const std::string & filename) :
-    AbstractShader(),
+ComputeShader::ComputeShader(GLContext *glContext, const std::string & filename) :
+    AbstractShader(glContext),
     m_filename(),
     m_fileWriteTime(-1)
 {

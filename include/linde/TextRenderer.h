@@ -28,7 +28,7 @@ namespace linde
     * Use freetype library to create bitmaps from font files.
     * Render text on screen.
     */
-    class TextRenderer
+    class TextRenderer : public GLObject
     {
         GLint m_fontSize;
         FT_Library m_ft;
@@ -46,7 +46,7 @@ namespace linde
 		GLuint m_tex;
 
     public:
-        TextRenderer();
+        TextRenderer(GLContext * glContext);
         ~TextRenderer();
 
 		GLvoid render(const std::string & text, const  glm::vec2 & pos) const;

@@ -13,8 +13,9 @@ namespace linde
 #################################################################################
 #################################################################################
 */
-TextureMultisample::TextureMultisample()
-    : m_id(0),
+TextureMultisample::TextureMultisample(GLContext *glContext)  :
+    GLObject(glContext),
+    m_id(0),
     m_target(GL_TEXTURE_2D_MULTISAMPLE),
 	m_samples(1),
     m_width(0),
@@ -27,8 +28,9 @@ TextureMultisample::TextureMultisample()
 }
 
 //Create empty texture
-TextureMultisample::TextureMultisample(GLsizei width, GLsizei height, GLsizei numSamples, GLint internalFormat, GLboolean fixedSampleLocations, GLint envMode)
-    : m_id(0),
+TextureMultisample::TextureMultisample(GLContext * glContext, GLsizei width, GLsizei height, GLsizei numSamples, GLint internalFormat, GLboolean fixedSampleLocations, GLint envMode) :
+    GLObject(glContext),
+    m_id(0),
     m_target(GL_TEXTURE_2D_MULTISAMPLE),
 	m_samples(numSamples),
     m_width(width),

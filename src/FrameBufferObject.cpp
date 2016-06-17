@@ -4,7 +4,8 @@
 namespace linde
 {
 
-FrameBufferObject::FrameBufferObject() :
+FrameBufferObject::FrameBufferObject(GLContext *glContext) :
+    GLObject(glContext),
     m_target(nullptr),
     m_depth(nullptr)
 {
@@ -71,9 +72,9 @@ GLvoid FrameBufferObject::attachDepth(const std::shared_ptr<Texture> &texture)
 
 GLvoid FrameBufferObject::attachDepth(GLuint width, GLuint height)
 {
-    std::shared_ptr<Texture> depth(new Texture(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE,
+    std::shared_ptr<Texture> depth = std::make_shared<Texture>(getGLContext(), width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE,
                                                                GL_LINEAR, GL_LINEAR,
-                                                               GL_REPLACE, GL_REPEAT));
+                                                               GL_REPLACE, GL_REPEAT);
     attachDepth(depth);
 }
 
