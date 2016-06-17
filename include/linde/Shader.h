@@ -28,9 +28,7 @@
 namespace linde
 {
 
-class GLContext;
-
-class AbstractShader : public GLObject
+class AbstractShader
 {
 protected:
 
@@ -39,7 +37,7 @@ protected:
     const GLchar *  readFile(const std::string & filename) const;
 
 public:
-    AbstractShader(GLContext * glContext);
+    AbstractShader();
     virtual ~AbstractShader();
 
     void bind(GLboolean bind);
@@ -104,9 +102,9 @@ protected:
 
 
 public:
-    Shader(GLContext * glContext);
-    Shader(GLContext * glContext, const std::string &vFileName, const std::string &gFileName, const std::string &fFileName);
-    Shader(GLContext * glContext, const std::string &vFileName, const std::string &fFileName);
+    Shader();
+    Shader(const std::string &vFileName, const std::string &gFileName, const std::string &fFileName);
+    Shader(const std::string &vFileName, const std::string &fFileName);
     virtual ~Shader();
 
     void checkShaderChanged();
@@ -151,8 +149,8 @@ protected:
 
 
 public:
-    ComputeShader(GLContext * glContext);
-    ComputeShader(GLContext * glContext, const std::string & filename);
+    ComputeShader();
+    ComputeShader(const std::string & filename);
 
     virtual ~ComputeShader();
 

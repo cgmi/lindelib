@@ -30,7 +30,7 @@ namespace linde
 * University of Konstanz-
 * Department for Computergraphics
 */
-class VertexBufferObject : public GLObject
+class VertexBufferObject
 {
 public:
     struct DATA
@@ -42,8 +42,8 @@ public:
     };
 
 
+    VertexBufferObject();
 public:
-    VertexBufferObject(GLContext * glContext);
     ~VertexBufferObject();
 
     void bind();
@@ -62,6 +62,10 @@ public:
 
     GLuint nrVertices() const;
     GLuint nrDynamicVertices() const;
+
+    static VertexBufferObject *createQuad(const glm::vec2 &topLeft, const glm::vec2 &topRight,
+		const glm::vec2 &bottomRight, const glm::vec2 &bottomLeft, float depth, const glm::vec4 &color);
+
 
 private:
     GLuint      m_nrVertices;

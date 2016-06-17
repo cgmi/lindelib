@@ -6,10 +6,8 @@
 
 #include "linde.h"
 
-
 namespace linde
 {
-class GLContext;
 
 
 #define VERTEX_POSITION 0
@@ -43,20 +41,6 @@ void  APIENTRY openGlDebugCallback(
         GLsizei length,
         const GLchar* message,
         const void* userParam);
-
-class GLObject
-{
-private:
-    GLContext * glContext;
-
-public:
-    GLObject(GLContext * glContext);
-    GLObject() = delete;
-    virtual ~GLObject();
-
-    GLContext *getGLContext() const;
-};
-
 
 } // namespace linde
 

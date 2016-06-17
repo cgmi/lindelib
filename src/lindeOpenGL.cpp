@@ -1,7 +1,5 @@
 #include "linde/lindeOpenGL.h"
 
-#include "../include/linde/GLContext.h"
-
 namespace linde
 {
 // http://blog.nobel-joergensen.com/2013/02/17/debugging-opengl-part-2-using-gldebugmessagecallback/
@@ -173,21 +171,4 @@ GLvoid glDisable2D()
 {
     disable2D();
 }
-
-GLObject::GLObject(GLContext *glContext) :
-    glContext(glContext)
-{
-
-}
-
-GLObject::~GLObject()
-{
-
-}
-
-GLContext *GLObject::getGLContext() const
-{
-    return glContext;
-}
-
 } // namespace linde

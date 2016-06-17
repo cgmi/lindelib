@@ -168,14 +168,18 @@ void GLContext::renderText(const std::string & text, const glm::vec2 & pos, cons
 
 std::shared_ptr<Texture> GLContext::createTexture(GLsizei width, GLsizei height, GLint internalFormat, GLenum format, GLint type, GLint minFilter, GLint magFilter, GLint envMode, GLint wrapMode)
 {
-    return std::make_shared<Texture>(this, width, height, internalFormat, format, type, minFilter, magFilter, envMode, wrapMode);
+    makeContextCurrent();
+
+    return std::make_shared<Texture>(width, height, internalFormat, format, type, minFilter, magFilter, envMode, wrapMode);
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec3> & source,
                                                   GLint minFilter, GLint magFilter,
                                                   GLint envMode, GLint wrapMode)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGB32F, GL_RGB, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    makeContextCurrent();
+
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(source.cols, source.rows, GL_RGB32F, GL_RGB, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
     cv::Mat_<glm::vec3> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -187,7 +191,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec4> & so
                                                   GLint minFilter, GLint magFilter,
                                                   GLint envMode, GLint wrapMode)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    makeContextCurrent();
+
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(source.cols, source.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
     cv::Mat_<glm::vec4> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -199,7 +205,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<float> & source
                                                   GLint minFilter, GLint magFilter,
                                                   GLint envMode, GLint wrapMode)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE32F_ARB, GL_RED, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    makeContextCurrent();
+
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(source.cols, source.rows, GL_LUMINANCE32F_ARB, GL_RED, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
     cv::Mat_<float> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -211,7 +219,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<uchar> & source
                                                   GLint minFilter, GLint magFilter,
                                                   GLint envMode, GLint wrapMode)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE8, GL_RED, GL_UNSIGNED_BYTE, minFilter, magFilter, envMode, wrapMode);
+    makeContextCurrent();
+
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(source.cols, source.rows, GL_LUMINANCE8, GL_RED, GL_UNSIGNED_BYTE, minFilter, magFilter, envMode, wrapMode);
     cv::Mat_<uchar> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -221,42 +231,57 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<uchar> & source
 
 std::shared_ptr<TextureMultisample> GLContext::createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples, GLenum internalFormat, GLboolean fixedSampleLocation)
 {
-    return std::make_shared<TextureMultisample>(this, width, height, samples, internalFormat, fixedSampleLocation);
+    makeContextCurrent();
+
+    return std::make_shared<TextureMultisample>(width, height, samples, internalFormat, fixedSampleLocation);
 }
 
 std::shared_ptr<Shader> GLContext::createPipelineShader(const std::string &vertexSource, const std::string &fragSource)
 {
-    return std::make_shared<Shader>(this, vertexSource, fragSource);
+    makeContextCurrent();
+    return std::make_shared<Shader>(vertexSource, fragSource);
 }
 
 std::shared_ptr<Shader> GLContext::createPipelineShader(const std::string &vertexSource, const std::string &geometrySource, const std::string &fragSource)
 {
-    return std::make_shared<Shader>(this, vertexSource, geometrySource, fragSource);
+    makeContextCurrent();
+
+    return std::make_shared<Shader>(vertexSource, geometrySource, fragSource);
 }
 
 std::shared_ptr<ComputeShader> GLContext::createComputeShader(const std::string & source)
 {
-    return std::make_shared<ComputeShader>(this, source);
+    makeContextCurrent();
+
+    return std::make_shared<ComputeShader>(source);
 }
 
 std::shared_ptr<VertexBufferObject> GLContext::createVertexBufferObject()
 {
-    return std::make_shared<VertexBufferObject>(this);
+    makeContextCurrent();
+
+    return std::make_shared<VertexBufferObject>();
 }
 
 std::shared_ptr<FrameBufferObject> GLContext::createFramebufferObject()
 {
-    return std::make_shared<FrameBufferObject>(this);
+    makeContextCurrent();
+
+    return std::make_shared<FrameBufferObject>();
 }
 
 std::shared_ptr<FrameBufferObjectMultisample> GLContext::createFramebufferObjectMultisample()
 {
-    return std::make_shared<FrameBufferObjectMultisample>(this);
+    makeContextCurrent();
+
+    return std::make_shared<FrameBufferObjectMultisample>();
 }
 
 std::shared_ptr<ShaderStorageBufferObject>   GLContext::createShaderStoragebufferObject()
 {
-    return  std::make_shared<ShaderStorageBufferObject>(this);
+    makeContextCurrent();
+
+    return  std::make_shared<ShaderStorageBufferObject>();
 }
 
 } // namespace linde

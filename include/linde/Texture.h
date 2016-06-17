@@ -1,19 +1,23 @@
 #ifndef LINDE_TEXTURE_H
 #define LINDE_TEXTURE_H
 
-#include "GLContext.h"
+#include "lindeOpenGL.h"
 
 namespace linde
 {
 
+class FrameBufferObject;
+
 /**
 * @author Thomas Lindemeier, Sören Pirk
 */
-class Texture : public GLObject
+class Texture
 {
+    friend class FrameBufferObject;
+
 public:
-    Texture(GLContext * glContext);
-    Texture(GLContext *glContext, GLsizei width, GLsizei height,
+    Texture();
+    Texture(GLsizei width, GLsizei height,
             GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
             GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
             GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);

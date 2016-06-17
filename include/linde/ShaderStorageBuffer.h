@@ -6,12 +6,12 @@
 
 namespace linde
 {	
-class ShaderStorageBufferObject : public GLObject
+class ShaderStorageBufferObject
 {
     GLuint m_handle;
 
 public:
-    ShaderStorageBufferObject(GLContext * glContext);
+    ShaderStorageBufferObject();
     ~ShaderStorageBufferObject();
 
     // retun current buffer size in bytes
