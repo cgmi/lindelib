@@ -41,6 +41,7 @@ list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/Histogram.h
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/ResourceHandler.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/KubelkaMunk.h)
 list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/GLContext.h)
+list(APPEND lindeLib_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/linde/WorkerThread.h)
 
 # add my sources to project
 list(APPEND lindeLib_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/Interpolation.cpp)
