@@ -14,6 +14,19 @@ namespace linde
 namespace thread
 {
 
+template <typename T, typename Work>
+auto then(std::future<T> f, Work w) -> std::future<decltype(w(f.get()))>
+{
+    return std::async([](std::future<T> f, Work w)
+                      { return w(f.get()); }, std::move(f), std::move(w));
+}
+
+template <typename Work>
+auto then(std::future<void> f, Work w) -> std::future<decltype(w())>
+{
+    return std::async([](std::future<void> f, Work w)
+                      { f.wait(); return w(); }, std::move(f), std::move(w));
+}
 
 class Worker
 {
@@ -67,20 +80,21 @@ void Worker::start()
 
             std::unique_lock<std::mutex> lock(m_mutex);
 
-            if (m_tasks.empty())
+            while (m_tasks.empty())
             {
                 m_condition.wait(lock);
+                if (m_terminate)
+                {
+                    return;
+                }
             }
-            if (!m_tasks.empty())
-            {
-                f = std::move(m_tasks.front());
-                m_tasks.pop_front();
-            }
+
+            f = std::move(m_tasks.front());
+            m_tasks.pop_front();
 
             lock.unlock();
 
-            if (f.valid())
-                f();
+            f();
         }
     });
 }
