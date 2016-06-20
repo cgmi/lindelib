@@ -32,8 +32,9 @@ public:
 
     void start();
 
-    template <typename Ret>
-    std::future<Ret> execute(std::function<Ret()> &&f);
+    template <typename Function>
+    auto execute(Function &&function) -> std::future<decltype(function())>;
+
 };
 
 Worker::Worker() :
@@ -79,17 +80,17 @@ void Worker::start()
     });
 }
 
-template <typename Ret>
-std::future<Ret> Worker::execute(std::function<Ret()> &&f)
+template <typename Function>
+auto Worker::execute(Function &&function) -> std::future<decltype(function())>
 {
-    std::packaged_task<Ret()> p(std::move(f));
-    std::future<Ret> r = p.get_future();
+    std::packaged_task<decltype(function())()> task(std::move(function));
+    auto result = task.get_future();
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_tasks.emplace_back(std::move(p));
+        m_tasks.emplace_back(std::move(task));
     }
     m_condition.notify_one();
-    return r;
+    return result;
 }
 
 } // namespace thread
