@@ -25,12 +25,11 @@ class Worker
 
     std::atomic_bool                        m_terminate;
 
+    void start();
 
 public:
     Worker();
     ~Worker();
-
-    void start();
 
     template <class Function>
     std::future<typename std::result_of<Function()>::type> submit(Function &&function);
@@ -43,13 +42,15 @@ Worker::Worker() :
     m_tasks(),
     m_terminate(false)
 {
-
+    start();
 }
 
 Worker::~Worker()
 {
     m_terminate = true;
+
     m_condition.notify_all();
+
     if (m_thread.joinable())
         m_thread.join();
 }
@@ -63,19 +64,23 @@ void Worker::start()
         while(!m_terminate)
         {
             std::packaged_task<void()> f;
+
+            std::unique_lock<std::mutex> lock(m_mutex);
+
+            if (m_tasks.empty())
             {
-                std::unique_lock<std::mutex> lock(m_mutex);
-                while (m_tasks.empty())
-                {
-                    m_condition.wait(lock, [&]
-                    {
-                        return !m_tasks.empty();
-                    });
-                }
+                m_condition.wait(lock);
+            }
+            if (!m_tasks.empty())
+            {
                 f = std::move(m_tasks.front());
                 m_tasks.pop_front();
             }
-            f();
+
+            lock.unlock();
+
+            if (f.valid())
+                f();
         }
     });
 }
