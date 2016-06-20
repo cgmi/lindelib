@@ -11,7 +11,11 @@
 namespace linde
 {
 
-class WorkerThread
+namespace thread
+{
+
+
+class Worker
 {
     std::thread                             m_thread;
     std::mutex                              m_mutex;
@@ -23,13 +27,15 @@ class WorkerThread
 
 
 public:
-    WorkerThread();
-    ~WorkerThread();
+    Worker();
+    ~Worker();
+
     void start();
-    std::future<void>  execute(std::function<void()> f);
+
+    auto execute(std::function<void()> f);
 };
 
-WorkerThread::WorkerThread() :
+Worker::Worker() :
     m_mutex(),
     m_condition(),
     m_tasks(),
@@ -38,39 +44,41 @@ WorkerThread::WorkerThread() :
 
 }
 
-WorkerThread::~WorkerThread()
+Worker::~Worker()
 {
-    m_terminate.store(true);
+    m_terminate = true;
     m_condition.notify_all();
     if (m_thread.joinable())
         m_thread.join();
 }
 
-void WorkerThread::start()
+void Worker::start()
 {
-    m_terminate.store(false);
+    m_terminate = false;
 
     m_thread = std::thread([&]()
     {
-        while(!m_terminate.load())
+        while(!m_terminate)
         {
             std::packaged_task<void()> f;
             {
                 std::unique_lock<std::mutex> l(m_mutex);
                 if (m_tasks.empty())
                 {
-                    m_condition.wait(l, [&]{return !m_tasks.empty();});
+                    m_condition.wait(l, [&]
+                    {
+                        return !m_tasks.empty();
+                    });
                 }
                 f = std::move(m_tasks.front());
                 m_tasks.pop();
             }
-            if (!f.valid()) return;
             f();
         }
     });
 }
 
-std::future<void> WorkerThread::execute(std::function<void()> f)
+auto Worker::execute(std::function<void()> f)
 {
     std::packaged_task<void()> p(f);
     auto r = p.get_future();
@@ -81,6 +89,8 @@ std::future<void> WorkerThread::execute(std::function<void()> f)
     }
     return r;
 }
+
+} // namespace thread
 
 }// namespace linde
 
