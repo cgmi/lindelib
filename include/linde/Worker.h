@@ -21,7 +21,7 @@ class Worker
     std::mutex                              m_mutex;
     std::condition_variable                 m_condition;
 
-    std::queue<std::packaged_task<void()> > m_tasks;
+    std::deque<std::packaged_task<void()> > m_tasks;
 
     std::atomic_bool                        m_terminate;
 
@@ -32,7 +32,8 @@ public:
 
     void start();
 
-    auto execute(std::function<void()> f);
+    template <typename Ret>
+    std::future<Ret> execute(std::function<Ret()> &&f);
 };
 
 Worker::Worker() :
@@ -62,31 +63,32 @@ void Worker::start()
         {
             std::packaged_task<void()> f;
             {
-                std::unique_lock<std::mutex> l(m_mutex);
-                if (m_tasks.empty())
+                std::unique_lock<std::mutex> lock(m_mutex);
+                while (m_tasks.empty())
                 {
-                    m_condition.wait(l, [&]
+                    m_condition.wait(lock, [&]
                     {
                         return !m_tasks.empty();
                     });
                 }
                 f = std::move(m_tasks.front());
-                m_tasks.pop();
+                m_tasks.pop_front();
             }
             f();
         }
     });
 }
 
-auto Worker::execute(std::function<void()> f)
+template <typename Ret>
+std::future<Ret> Worker::execute(std::function<Ret()> &&f)
 {
-    std::packaged_task<void()> p(f);
-    auto r = p.get_future();
+    std::packaged_task<Ret()> p(std::move(f));
+    std::future<Ret> r = p.get_future();
     {
-        std::unique_lock<std::mutex> l(m_mutex);
-        m_tasks.push(std::move(p));
-        m_condition.notify_one();
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_tasks.emplace_back(std::move(p));
     }
+    m_condition.notify_one();
     return r;
 }
 
