@@ -13,15 +13,14 @@ namespace linde
 
 class WorkerThread
 {
+    std::thread                             m_thread;
     std::mutex                              m_mutex;
-    std::mutex                              m_workMutex;
     std::condition_variable                 m_condition;
-    std::queue<std::packaged_task<void()> > m_tasks;
-    std::future<void>                       m_guard;
-    bool                                    m_working;
 
-    bool keepWorking();
-    void stopWorking();
+    std::queue<std::packaged_task<void()> > m_tasks;
+
+    std::atomic_bool                        m_terminate;
+
 
 public:
     WorkerThread();
@@ -30,35 +29,30 @@ public:
     std::future<void>  execute(std::function<void()> f);
 };
 
-bool WorkerThread::keepWorking()
+WorkerThread::WorkerThread() :
+    m_mutex(),
+    m_condition(),
+    m_tasks(),
+    m_terminate(false)
 {
-    std::unique_lock<std::mutex> lock(m_workMutex);
-    return m_working;
-}
 
-void WorkerThread::stopWorking()
-{
-    std::unique_lock<std::mutex> lock(m_workMutex);
-    m_working = false;
 }
-
-WorkerThread::WorkerThread() {}
 
 WorkerThread::~WorkerThread()
 {
-    stopWorking();
+    m_terminate.store(true);
     m_condition.notify_all();
-    if (m_guard.valid())
-        m_guard.wait();
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 void WorkerThread::start()
 {
-    m_working = true;
+    m_terminate.store(false);
 
-    m_guard = std::async(std::launch::async, [&]()
+    m_thread = std::thread([&]()
     {
-        while(keepWorking())
+        while(!m_terminate.load())
         {
             std::packaged_task<void()> f;
             {
