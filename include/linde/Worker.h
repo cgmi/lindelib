@@ -32,8 +32,8 @@ public:
 
     void start();
 
-    template <typename Function>
-    auto execute(Function &&function) -> std::future<decltype(function())>;
+    template <class Function>
+    std::future<typename std::result_of<Function()>::type> submit(Function &&function);
 
 };
 
@@ -80,10 +80,10 @@ void Worker::start()
     });
 }
 
-template <typename Function>
-auto Worker::execute(Function &&function) -> std::future<decltype(function())>
+template <class Function>
+std::future<typename std::result_of<Function()>::type> Worker::submit(Function &&function)
 {
-    std::packaged_task<decltype(function())()> task(std::move(function));
+    std::packaged_task<typename std::result_of<Function()>::type()> task(std::move(function));
     auto result = task.get_future();
     {
         std::unique_lock<std::mutex> lock(m_mutex);
