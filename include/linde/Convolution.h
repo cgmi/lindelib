@@ -114,6 +114,23 @@ inline void kernelScharrParametricX(cv::Mat_<Type> & kernel_x, const Type p1 = 0
     kernel_x(1, 2) = Type(2)*p1 - Type(1);
 }
 
+template <class T>
+void resizeAndPad(const cv::Mat_<T> & source, cv::Mat_<T> & output, const cv::Size & canvasSize, int interpolation = cv::INTER_NEAREST, int border = cv::BORDER_REFLECT, cv::Scalar padValue = cv::Scalar(0))
+{
+    const float scaleWidth = canvasSize.width / (float)source.cols;
+    const float scaleHeight = canvasSize.height / (float)source.rows;
+
+    const float scale = glm::min<float>(scaleHeight, scaleWidth);
+
+    cv::resize(source, output, cv::Size(source.cols * scale, source.rows * scale), interpolation);
+
+    int wd = canvasSize.width - output.cols;
+    int hd = canvasSize.height - output.rows;
+    cv::copyMakeBorder(output, output, hd/2, hd/2, wd/2, wd/2, border, padValue);
+
+}
+
+
 // lambda = wavelength of sinusoidal factor
 // theta orientation of the normal of the parallel stripes
 // sigmaEnvelope = sigma of gaussian envelope
