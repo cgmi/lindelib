@@ -100,7 +100,10 @@ std::string extractFiletype(const std::string & filename)
     return res;
 }
 
-
+cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal)
+{
+    return imLoad(filenameOriginal, nullptr);
+}
 
 
 // opencv imRead wrapper
@@ -156,42 +159,47 @@ cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal, convert_color_c
     return res;
 }
 
- cv::Mat_<float> imLoadSingleChannel(const std::string & filenameOriginal)
- {
-     std::string filename = filenameOriginal;
-     std::replace(filename.begin(), filename.end(), '\\', '/');
+cv::Mat_<float> imLoadSingleChannel(const std::string & filenameOriginal)
+{
+    std::string filename = filenameOriginal;
+    std::replace(filename.begin(), filename.end(), '\\', '/');
 
-     cv::Mat cv_mat = cv::imread(filename, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+    cv::Mat cv_mat = cv::imread(filename, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
 
-     // if not loaded succesfully
-     if (!cv_mat.data)
-     {
-         std::cerr << "could not decode image " << std::endl;
-         return cv::Mat_<float>();
-     }
+    // if not loaded succesfully
+    if (!cv_mat.data)
+    {
+        std::cerr << "could not decode image " << std::endl;
+        return cv::Mat_<float>();
+    }
 
-     // data scale
-     float scale = 1.0f;
-     if (cv_mat.depth() == CV_16U)
-         scale = 1.0f / 0xffff;
-     else if (cv_mat.depth() == CV_32F)
-         scale = 1.0f;
-     else if (cv_mat.depth() == CV_8U)
-         scale = 1.0f / 0xff;
-     else if (cv_mat.depth() == CV_64F)
-         scale = 1.0f / 0xffffffff;
+    // data scale
+    float scale = 1.0f;
+    if (cv_mat.depth() == CV_16U)
+        scale = 1.0f / 0xffff;
+    else if (cv_mat.depth() == CV_32F)
+        scale = 1.0f;
+    else if (cv_mat.depth() == CV_8U)
+        scale = 1.0f / 0xff;
+    else if (cv_mat.depth() == CV_64F)
+        scale = 1.0f / 0xffffffff;
 
-     // convert to right type
-     cv_mat.convertTo(cv_mat, CV_32FC1, scale);
+    // convert to right type
+    cv_mat.convertTo(cv_mat, CV_32FC1, scale);
 
-     cv::Mat_<float> res = cv_mat;
+    cv::Mat_<float> res = cv_mat;
 
-     return res;
- }
+    return res;
+}
 
 // opencv imRead wrapper
 // retuns floating point RGB(A) image, 3 or 4 channel
 // think about sRGB -> RGB conversion afterwards
+cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer)
+{
+    return imLoad(buffer, nullptr);
+}
+
 cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer,  convert_color_call colorConversion)
 {
 
@@ -298,7 +306,7 @@ bool imSaveCV(const std::string & filenameOriginal, const cv::Mat & cv_mat, cons
     cv::Mat m;
 
     if (filetype == "png")
-    {        
+    {
         if (cv_mat.depth() == CV_16U)
         {
             m = cv_mat.clone();
@@ -324,7 +332,7 @@ bool imSaveCV(const std::string & filenameOriginal, const cv::Mat & cv_mat, cons
 
     }
     else
-    {        
+    {
         if (cv_mat.depth() == CV_16U)
         {
             const float scale = (float)0xff;
@@ -359,6 +367,11 @@ bool imSaveCV(const std::string & filenameOriginal, const cv::Mat & cv_mat, cons
 // automatically converts to right type
 // expects image to be RGB(A)
 // convert to sRGB! before saving
+bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & mat)
+{
+    return imSave(filenameOriginal, mat, nullptr, std::vector<int>());
+}
+
 bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & mat, convert_color_call colorConversion, const std::vector<int>& params)
 {
     std::string filename = filenameOriginal;
@@ -399,6 +412,11 @@ bool imSave(const std::string & filenameOriginal, const cv::Mat_<uchar> & mat)
     std::replace(filename.begin(), filename.end(), '\\', '/');
 
     return cv::imwrite(filename, mat);
+}
+
+bool imSave(const std::string & filenameOriginal, const cv::Mat_<float> & mat)
+{
+    return imSave(filenameOriginal, mat, std::vector<int>());
 }
 
 bool imSave(const std::string & filenameOriginal, const cv::Mat_<float> & mat, const std::vector<int>& params)

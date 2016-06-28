@@ -1,0 +1,5 @@
+var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/Philip_Tina/Philip_Tina.jpg");
+
+var a = gaussian_derivative_energy(m, 1.0, 6);
+
+imshow("input", a, 0);

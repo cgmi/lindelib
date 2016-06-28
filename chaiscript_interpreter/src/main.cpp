@@ -1,21 +1,30 @@
-#include <linde/linde.h>
-#include <linde/GLWindow.h>
-
+#include "Chai.h"
+#include <chaiscript/chaiscript_stdlib.hpp>
 
 int main(int argc, char ** args)
 {
+    chaiscript::ChaiScript chai(chaiscript::Std_Lib::library());
 
-    linde::GLWindow window(1024, 1024, "example_project");
-
-    glClearColor(1.f, 1.f, 1.f, 1.f);
-
-    auto renderStep = [&]()
+    if (argc < 2)
     {
-        glClear(GL_COLOR_BUFFER_BIT);
+        std::cerr << "no script given as argument" << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    };
+    addLindeLibFunctions(chai);
 
-    window.setRenderFunction(renderStep);
+    try
+    {
+        chai.eval_file(args[1]);
+    }
+    catch (const std::string & e)
+    {
+        std::cerr << e << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 
-    return window.renderLoop(true);
+    return EXIT_SUCCESS;
 }
