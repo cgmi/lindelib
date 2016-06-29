@@ -142,11 +142,12 @@ void addImageTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&createMat3_vec_value), "Mat3");
     m->add(chaiscript::fun(&createMat1_vec_value), "Mat1");
 
-   // m->add(chaiscript::fun(&cv::Mat::at), "at");
+    m->add(chaiscript::fun<float&, cv::Mat_<float>, int, int>(&cv::Mat_<float>::at<float>), "at");
+    m->add(chaiscript::fun<glm::vec3&, cv::Mat_<glm::vec3>, int, int>(&cv::Mat_<glm::vec3>::at<glm::vec3>), "at");
+    m->add(chaiscript::fun<float&, cv::Mat_<float>, int>(&cv::Mat_<float>::at<float>), "at");
+    m->add(chaiscript::fun<glm::vec3&, cv::Mat_<glm::vec3>, int>(&cv::Mat_<glm::vec3>::at<glm::vec3>), "at");
 
     chai.add(m);
-
-
 }
 
 void addImageIO(chaiscript::ChaiScript &chai)

@@ -2,4 +2,10 @@ var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/Phili
 
 var a = Mat1(100, 100);
 
-imshow("input", a, 0);
+m.at(10, 10).x = 1.0f;
+m.at(10, 11).x = 1.0f;
+m.at(10, 12).x = 1.0f;
+m.at(10, 13).x = 1.0f;
+m.at(10, 14).x = 1.0f;
+
+imshow("input", m, 0);
