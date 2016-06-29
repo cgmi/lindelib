@@ -1,3 +1,11 @@
 var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/car_0/car_0.jpg");
-var lab = convert(m, convert_srgb2lab);
-imshow("input", lab, 0);
+
+for (var i = 0; i < m.rows; ++i)
+{
+	for (var j = 0; j < m.cols; ++j)
+	{
+  		m.at(i, j).x += 0.3f;
+	}
+}
+
+imshow("input", m, 0);

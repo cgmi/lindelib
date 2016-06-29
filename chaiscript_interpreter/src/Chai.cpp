@@ -24,6 +24,37 @@ void imShow(const std::string & window, const cv::Mat_<T> & image, int waitmsecs
 }
 
 template <class T>
+cv::Mat_<T> normalize_image(const cv::Mat_<T>& source, const T & low, const T & high, const T & min, const T & max)
+{
+    cv::Mat_<T> out(source.size());
+    for (uint i = 0; i < source.total(); i++)
+    {
+        out(i) = linde::mapRange(source(i), low, high, min, max);
+    }
+
+    return out;
+}
+
+template <class T>
+cv::Mat_<T> normalize_image(const cv::Mat_<T>& source, const T & lower, const T & upper)
+{
+    cv::Mat_<T> out(source.size());
+    T min(std::numeric_limits<float>::max());
+    T max(0.);
+    for (uint i = 0; i < source.total(); i++)
+    {
+        min = glm::min(min, source(i));
+        max = glm::max(max, source(i));
+    }
+    for (uint i = 0; i < source.total(); i++)
+    {
+        out(i) = linde::mapRange(source(i), min, max, lower, upper);
+    }
+
+    return out;
+}
+
+template <class T>
 cv::Mat_<T> gaussian_blur(const cv::Mat_<T>& source, float sigma)
 {
     cv::Mat_<T> out;
@@ -117,6 +148,17 @@ cv::Mat_<float> gaborWrapper(const glm::ivec2 & kernelSize, const float sigma, c
     return out;
 }
 
+cv::Mat_<float> gaus1stWrapper(const glm::ivec2 & kernelSize, const float sigma, const float theta)
+{
+   return linde::createGauss1stDerivativeKernel(cv::Size(kernelSize.x, kernelSize.y), sigma, theta, true);
+}
+
+cv::Mat_<float> gaus2ndWrapper(const glm::ivec2 & kernelSize, const float sigma, const float theta)
+{
+   return linde::createGauss2ndDerivativeKernel(cv::Size(kernelSize.x, kernelSize.y), sigma, theta, true);
+}
+
+
 
 template <class T>
 cv::Mat_<T> resizeWrapper(const cv::Mat_<T> & source, const glm::ivec2 & size, cv::InterpolationFlags interpolation)
@@ -134,6 +176,26 @@ cv::Mat_<glm::vec3> convert_image_wrapper(const cv::Mat_<glm::vec3> & source, st
         conversion(source(i), out(i));
     }
     return out;
+}
+
+cv::Mat mat_add_helper(const cv::Mat & a, const cv::Mat & b)
+{
+    return cv::operator+(a, b);
+}
+
+cv::Mat mat_sub_helper(const cv::Mat & a, const cv::Mat & b)
+{
+    return cv::operator-(a, b);
+}
+
+cv::Mat mat_div_helper(const cv::Mat & a, const cv::Mat & b)
+{
+    return cv::operator/(a, b);
+}
+
+cv::Mat mat_mul_helper(const cv::Mat & a, const cv::Mat & b)
+{
+    return cv::operator*(a, b);
 }
 
 
@@ -277,6 +339,7 @@ void addImageTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&cv::Mat::cols), "cols");
     m->add(chaiscript::fun(&cv::Mat::empty), "empty");
     m->add(chaiscript::fun(&cv::Mat::total), "total");
+    m->add(chaiscript::fun<cv::Mat&, cv::Mat, const cv::Mat&>(&cv::Mat::operator =), "=");
     m->add(chaiscript::constructor<cv::Mat_<glm::vec3>()>(), "Mat3");
     m->add(chaiscript::constructor<cv::Mat_<float>()>(), "Mat1");
     m->add(chaiscript::constructor<cv::Mat_<glm::vec3>(int, int)>(), "Mat3");
@@ -287,6 +350,11 @@ void addImageTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&createMat1_vec), "Mat1");
     m->add(chaiscript::fun(&createMat3_vec_value), "Mat3");
     m->add(chaiscript::fun(&createMat1_vec_value), "Mat1");
+
+    m->add(chaiscript::fun(&mat_add_helper), "+");
+    m->add(chaiscript::fun(&mat_sub_helper), "-");
+    m->add(chaiscript::fun(&mat_div_helper), "/");
+    m->add(chaiscript::fun(&mat_mul_helper), "*");
 
     m->add(chaiscript::fun<float&, cv::Mat_<float>, int, int>(&cv::Mat_<float>::operator()), "at");
     m->add(chaiscript::fun<glm::vec3&, cv::Mat_<glm::vec3>, int, int>(&cv::Mat_<glm::vec3>::operator()), "at");
@@ -345,8 +413,12 @@ void addImageProc(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&filter2DWrapper<glm::vec3>), "convolve");
     m->add(chaiscript::fun(&filter2DWrapper<float>), "convolve");
     m->add(chaiscript::fun(&gaborWrapper), "createGaborKernel");
-    m->add(chaiscript::fun(&linde::createGauss1stDerivativeKernel), "createGauss1stDerivativeKernel");
-    m->add(chaiscript::fun(&linde::createGauss2ndDerivativeKernel), "createGauss2ndDerivativeKernel");
+    m->add(chaiscript::fun(&gaus1stWrapper), "createGauss1stDerivativeKernel");
+    m->add(chaiscript::fun(&gaus2ndWrapper), "createGauss2ndDerivativeKernel");
+    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3> &, const glm::vec3 &, const glm::vec3 &, const glm::vec3 &, const glm::vec3 & >(&normalize_image<glm::vec3>), "normalize");
+    m->add(chaiscript::fun<cv::Mat_<float>, const cv::Mat_<float> &, const float &, const float &, const float &, const float& >(&normalize_image<float>), "normalize");
+    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3> &, const glm::vec3 &, const glm::vec3 &>(&normalize_image<glm::vec3>), "normalize");
+    m->add(chaiscript::fun<cv::Mat_<float>, const cv::Mat_<float> &, const float &, const float &>(&normalize_image<float>), "normalize");
 
     chai.add(m);
 }
@@ -386,7 +458,7 @@ void addColorFunctions(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&linde::convert_rgb2L_alpha_beta), "convert_rgb2L_alpha_beta");
     m->add(chaiscript::fun(&linde::convert_L_alpha_beta2rgb), "convert_L_alpha_beta2rgb");
 
-    m->add(chaiscript::fun(&convert_image_wrapper), "convert");
+    m->add(chaiscript::fun(&convert_image_wrapper), "convert_color");
 
     chai.add(m);
 }
