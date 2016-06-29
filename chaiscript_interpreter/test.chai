@@ -1,11 +1,5 @@
 var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/Philip_Tina/Philip_Tina.jpg");
 
-var a = Mat1(100, 100);
-
-m.at(10, 10).x = 1.0f;
-m.at(10, 11).x = 1.0f;
-m.at(10, 12).x = 1.0f;
-m.at(10, 13).x = 1.0f;
-m.at(10, 14).x = 1.0f;
+m.at(10, 10) = vec3(1.0f, 0.0f, 0.0f) + vec3(0.0f, 0.0f, 1.0f);
 
 imshow("input", m, 0);
