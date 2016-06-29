@@ -120,8 +120,8 @@ void convert_L_alpha_beta2rgb(const glm::vec3 & LAlphaBeta, glm::vec3 & rgb);
 
 
 // template for image conversions
-typedef void(*convert_color_call)(const glm::vec3 &, glm::vec3 &);
-void convert_image(const cv::Mat_<glm::vec3 > & in, cv::Mat_<glm::vec3 > & out, convert_color_call conversion);
+//typedef void(*convert_color_call)(const glm::vec3 &, glm::vec3 &);
+void convert_image(const cv::Mat_<glm::vec3 > & in, cv::Mat_<glm::vec3 > & out, std::function<void(const glm::vec3 &, glm::vec3 &)> conversion);
 
 
 // distances http://en.wikipedia.org/wiki/Color_difference

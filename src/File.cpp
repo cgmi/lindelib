@@ -102,14 +102,14 @@ std::string extractFiletype(const std::string & filename)
 
 cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal)
 {
-    return imLoad(filenameOriginal, nullptr);
+    return imLoad(filenameOriginal, std::function<void(const glm::vec3&, glm::vec3&)>());
 }
 
 
 // opencv imRead wrapper
 // retuns floating point RGB(A) image, 3 or 4 channel
 // think about sRGB -> RGB conversion afterwards
-cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal, convert_color_call colorConversion)
+cv::Mat_<glm::vec3> imLoad(const std::string & filenameOriginal, std::function<void(const glm::vec3&, glm::vec3&)> colorConversion)
 {
     std::string filename = filenameOriginal;
     std::replace(filename.begin(), filename.end(), '\\', '/');
@@ -197,10 +197,10 @@ cv::Mat_<float> imLoadSingleChannel(const std::string & filenameOriginal)
 // think about sRGB -> RGB conversion afterwards
 cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer)
 {
-    return imLoad(buffer, nullptr);
+    return imLoad(buffer, [](const glm::vec3 &a, glm::vec3&b){b=a;});
 }
 
-cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer,  convert_color_call colorConversion)
+cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> &buffer, std::function<void(const glm::vec3&, glm::vec3&)> colorConversion)
 {
 
     cv::Mat cv_mat = cv::imdecode(buffer, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_COLOR);
@@ -372,7 +372,7 @@ bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & ma
     return imSave(filenameOriginal, mat, nullptr, std::vector<int>());
 }
 
-bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & mat, convert_color_call colorConversion, const std::vector<int>& params)
+bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & mat, std::function<void(const glm::vec3&, glm::vec3&)> colorConversion, const std::vector<int>& params)
 {
     std::string filename = filenameOriginal;
     std::replace(filename.begin(), filename.end(), '\\', '/');
@@ -403,7 +403,7 @@ bool imSave(const std::string & filenameOriginal, const cv::Mat_<glm::vec3> & ma
         output.convertTo(m, CV_MAKETYPE(CV_8U, 3), scale);
     }
     cv::cvtColor(m, m, cv::COLOR_RGB2BGR);
-    return cv::imwrite(filename, m);
+    return cv::imwrite(filename, m, params);
 }
 
 bool imSave(const std::string & filenameOriginal, const cv::Mat_<uchar> & mat)

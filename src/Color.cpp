@@ -635,7 +635,7 @@ float ColorDifference(const glm::vec3 &lab0, const glm::vec3 &lab1)
 
 void convert_image(
         const cv::Mat_<glm::vec3> & in, cv::Mat_<glm::vec3> & out,
-        convert_color_call conversion)
+        std::function<void(const glm::vec3&, glm::vec3&)> conversion)
 {
     cv::Mat_<glm::vec3> temp(in.size());
 

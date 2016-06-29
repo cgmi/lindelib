@@ -1,7 +1,3 @@
-var r = vec3(0.25f, 0.25f, 0.25f);
-var a = vec3();
-convert_rgb2srgb(r, a);
-
-print(a);
-
-
+var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/car_0/car_0.jpg");
+var lab = convert(m, convert_srgb2lab);
+imshow("input", lab, 0);

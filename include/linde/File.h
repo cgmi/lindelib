@@ -31,9 +31,9 @@ namespace linde
 	// retuns floating point RGB(A) image, 3 or 4 channel
 	// think about sRGB -> RGB conversion afterwards
     cv::Mat_<glm::vec3> imLoad(const std::string & filename);
-    cv::Mat_<glm::vec3> imLoad(const std::string & filename, convert_color_call colorConversion);
+    cv::Mat_<glm::vec3> imLoad(const std::string & filename, std::function<void(const glm::vec3&, glm::vec3&)> colorConversion);
     cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> & buffer);
-    cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> & buffer, convert_color_call colorConversion);
+    cv::Mat_<glm::vec3> imLoad(const std::vector<uchar> & buffer, std::function<void(const glm::vec3&, glm::vec3&)> colorConversion);
     cv::Mat_<float>     imLoadSingleChannel(const std::string & filename);
 
 	// opencv wrapper for imWrite
@@ -44,7 +44,7 @@ namespace linde
     bool imSave(const std::string & filename, const cv::Mat_<float> & mat);
     bool imSave(const std::string & filename, const cv::Mat_<float> & mat, const std::vector<int>& params);
     bool imSave(const std::string & filename, const cv::Mat_<glm::vec3> & mat);
-    bool imSave(const std::string & filename, const cv::Mat_<glm::vec3> & mat, convert_color_call colorConversion, const std::vector<int>& params);
+    bool imSave(const std::string & filename, const cv::Mat_<glm::vec3> & mat, std::function<void(const glm::vec3&, glm::vec3&)>  colorConversion, const std::vector<int>& params);
 
 #ifdef USE_TIFF_STORAGE
     // image has to be in CIELAB color space

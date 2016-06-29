@@ -126,6 +126,16 @@ cv::Mat_<T> resizeWrapper(const cv::Mat_<T> & source, const glm::ivec2 & size, c
     return out;
 }
 
+cv::Mat_<glm::vec3> convert_image_wrapper(const cv::Mat_<glm::vec3> & source, std::function<void(const glm::vec3& a, glm::vec3&b)> conversion)
+{
+    cv::Mat_<glm::vec3> out(source.size());
+    for (uint i = 0; i < source.total(); i++)
+    {
+        conversion(source(i), out(i));
+    }
+    return out;
+}
+
 
 void addVectorTypes(chaiscript::ChaiScript &chai)
 {
@@ -375,6 +385,8 @@ void addColorFunctions(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun(&linde::convert_rgb2Yuv), "convert_rgb2Yuv");
     m->add(chaiscript::fun(&linde::convert_rgb2L_alpha_beta), "convert_rgb2L_alpha_beta");
     m->add(chaiscript::fun(&linde::convert_L_alpha_beta2rgb), "convert_L_alpha_beta2rgb");
+
+    m->add(chaiscript::fun(&convert_image_wrapper), "convert");
 
     chai.add(m);
 }
