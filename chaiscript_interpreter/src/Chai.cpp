@@ -2,9 +2,10 @@
 #include <chaiscript/utility/utility.hpp>
 #include <linde/File.h>
 #include <linde/Convolution.h>
+#include <linde/ResourceHandler.h>
 
 #include <opencv2/highgui/highgui.hpp>
-
+#include <opencv2/imgproc/imgproc.hpp>
 
 template <class T>
 void imShow(const std::string & window, const cv::Mat_<T> & image, int waitmsecs)
@@ -76,6 +77,55 @@ cv::Mat_<float> createMat1_vec(const glm::ivec2 & dim)
 {
     return cv::Mat_<float>(dim.y, dim.x);
 }
+
+
+std::string vec3_to_string(const glm::vec3 & v)
+{
+    return "("+std::to_string(v.x)+", "+std::to_string(v.y)+", "+std::to_string(v.z)+")";
+}
+
+std::string vec2_to_string(const glm::vec2 & v)
+{
+    return "("+std::to_string(v.x)+", "+std::to_string(v.y)+")";
+}
+
+std::string ivec2_to_string(const glm::ivec2 & v)
+{
+    return "("+std::to_string(v.x)+", "+std::to_string(v.y)+")";
+}
+
+std::string mat_to_string(const cv::Mat & v)
+{
+    std::stringstream ss;
+    ss << v;
+    return ss.str();
+}
+
+template <class T>
+cv::Mat_<T> filter2DWrapper(const cv::Mat_<T> & source, const cv::Mat_<float> & kernel)
+{
+    cv::Mat_<T> out;
+    cv::filter2D(source, out, source.depth(), kernel, cv::Point(-1, -1), 0.0, cv::BORDER_REFLECT);
+    return out;
+}
+
+cv::Mat_<float> gaborWrapper(const glm::ivec2 & kernelSize, const float sigma, const float theta, const float lambda, const float gamma, const float psi)
+{
+    cv::Mat_<double> gabor = cv::getGaborKernel(cv::Size(kernelSize.x, kernelSize.y), sigma, theta, lambda, gamma, psi);
+    cv::Mat_<float> out;
+    gabor.convertTo(out, CV_32FC1, 1.0, 0.0);
+    return out;
+}
+
+
+template <class T>
+cv::Mat_<T> resizeWrapper(const cv::Mat_<T> & source, const glm::ivec2 & size, cv::InterpolationFlags interpolation)
+{
+    cv::Mat_<T> out;
+    cv::resize(source, out, cv::Size(size.x, size.y), 0.0, 0.0, interpolation);
+    return out;
+}
+
 
 void addVectorTypes(chaiscript::ChaiScript &chai)
 {
@@ -174,6 +224,32 @@ void addVectorTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun<glm::ivec2, int const &, glm::ivec2 const &>(&glm::operator/), "/");
     m->add(chaiscript::fun<glm::ivec2, int const &, glm::ivec2 const &>(&glm::operator*), "*");
 
+    m->add(chaiscript::fun<glm::vec3, glm::vec3 const &>(&glm::normalize), "normalize");
+    m->add(chaiscript::fun<glm::vec2, glm::vec2 const &>(&glm::normalize), "normalize");
+
+    m->add(chaiscript::fun<float, glm::vec2 const &, glm::vec2 const &>(&glm::distance), "distance");
+    m->add(chaiscript::fun<float, glm::vec3 const &, glm::vec3 const &>(&glm::distance), "distance");
+    m->add(chaiscript::fun<float, glm::vec2 const &, glm::vec2 const &>(&glm::distance2), "distance2");
+    m->add(chaiscript::fun<float, glm::vec3 const &, glm::vec3 const &>(&glm::distance2), "distance2");
+    m->add(chaiscript::fun<float, glm::vec2 const &>(&glm::length), "length");
+    m->add(chaiscript::fun<float, glm::vec3 const &>(&glm::length), "length");
+
+    m->add(chaiscript::fun(&vec3_to_string), "to_string");
+    m->add(chaiscript::fun(&vec2_to_string), "to_string");
+    m->add(chaiscript::fun(&ivec2_to_string), "to_string");
+
+    m->add(chaiscript::fun<glm::vec3, glm::vec3 const &, glm::vec3 const &>(&glm::pow), "pow");
+    m->add(chaiscript::fun<glm::vec2, glm::vec2 const &, glm::vec2 const &>(&glm::pow), "pow");
+    m->add(chaiscript::fun<float, float, float>(&glm::pow), "pow");
+
+    m->add(chaiscript::fun<glm::vec3, glm::vec3 const &>(&glm::exp), "exp");
+    m->add(chaiscript::fun<glm::vec2, glm::vec2 const &>(&glm::exp), "exp");
+    m->add(chaiscript::fun<float, float>(&glm::exp), "exp");
+
+    m->add(chaiscript::fun<glm::vec3, glm::vec3 const &>(&glm::sqrt), "sqrt");
+    m->add(chaiscript::fun<glm::vec2, glm::vec2 const &>(&glm::sqrt), "sqrt");
+    m->add(chaiscript::fun<float, float>(&glm::sqrt), "sqrt");
+
     chai.add(m);
 }
 
@@ -186,6 +262,7 @@ void addImageTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::base_class<cv::Mat, cv::Mat_<glm::vec3> >());
     m->add(chaiscript::base_class<cv::Mat, cv::Mat_<float> >());
 
+    m->add(chaiscript::fun(&mat_to_string), "to_string");
     m->add(chaiscript::fun(&cv::Mat::rows), "rows");
     m->add(chaiscript::fun(&cv::Mat::cols), "cols");
     m->add(chaiscript::fun(&cv::Mat::empty), "empty");
@@ -225,19 +302,88 @@ void addImageIO(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun<bool, const std::string&, const cv::Mat_<glm::vec3>&>(&linde::imSave), "imsave");
     m->add(chaiscript::fun<bool, const std::string&, const cv::Mat_<float>&>(&linde::imSave), "imsave");
 
-    // imgproc
-    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float>(&gaussian_blur), "gaussian_blur");
-    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float, int>(&ComputeGaussDerivativeEnergy), "gaussian_derivative_energy");
-
     // image show
     m->add(chaiscript::fun<void, const std::string&, const cv::Mat_<glm::vec3>&, int>(&imShow), "imshow");
     m->add(chaiscript::fun<void, const std::string&, const cv::Mat_<float>&, int>(&imShow), "imshow");
 
+    // Resource
+    m->add(chaiscript::fun(&ResourceHandler::getResource), "getResource");
+
     chai.add(m);
 }
+
+void addImageProc(chaiscript::ChaiScript &chai)
+{
+    chaiscript::ModulePtr m(new chaiscript::Module());
+
+    chaiscript::utility::add_class<cv::InterpolationFlags>(*m,
+                                                           "InterpolationFlags",
+    { { cv::INTER_NEAREST, "INTER_NEAREST" },
+      { cv::INTER_LINEAR, "INTER_LINEAR" },
+      { cv::INTER_CUBIC, "INTER_CUBIC" },
+      { cv::INTER_AREA, "INTER_AREA" },
+      { cv::INTER_LANCZOS4, "INTER_LANCZOS4" }
+
+                                                           }
+                                                           );
+    m->add(chaiscript::fun(&resizeWrapper<glm::vec3>), "resize");
+    m->add(chaiscript::fun(&resizeWrapper<float>), "resize");
+
+    // imgproc
+    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float>(&gaussian_blur), "gaussian_blur");
+    m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float, int>(&ComputeGaussDerivativeEnergy), "gaussian_derivative_energy");
+    m->add(chaiscript::fun(&filter2DWrapper<glm::vec3>), "convolve");
+    m->add(chaiscript::fun(&filter2DWrapper<float>), "convolve");
+    m->add(chaiscript::fun(&gaborWrapper), "createGaborKernel");
+    m->add(chaiscript::fun(&linde::createGauss1stDerivativeKernel), "createGauss1stDerivativeKernel");
+    m->add(chaiscript::fun(&linde::createGauss2ndDerivativeKernel), "createGauss2ndDerivativeKernel");
+
+    chai.add(m);
+}
+
+void addColorFunctions(chaiscript::ChaiScript &chai)
+{
+    chaiscript::ModulePtr m(new chaiscript::Module());
+
+    m->add(chaiscript::fun(&linde::convert_cmy2rgb), "convert_cmy2rgb");
+    m->add(chaiscript::fun(&linde::convert_lab2xyz), "convert_lab2xyz");
+    m->add(chaiscript::fun(&linde::convert_xyz2lab), "convert_xyz2lab");
+    m->add(chaiscript::fun(&linde::convert_lab2LCHab), "convert_lab2LCHab");
+    m->add(chaiscript::fun(&linde::convert_LCHab2lab), "convert_LCHab2lab");
+    m->add(chaiscript::fun(&linde::convert_ryb2rgb), "convert_ryb2rgb");
+    m->add(chaiscript::fun(&linde::convert_rgb2cmy), "convert_rgb2cmy");
+    m->add(chaiscript::fun(&linde::convert_cmy2rgb), "convert_cmy2rgb");
+    m->add(chaiscript::fun(&linde::convert_rgb2xyz), "convert_rgb2xyz");
+    m->add(chaiscript::fun(&linde::convert_xyz2rgb), "convert_xyz2rgb");
+    m->add(chaiscript::fun(&linde::convert_srgb2rgb), "convert_srgb2rgb");
+    m->add(chaiscript::fun(&linde::convert_rgb2srgb), "convert_rgb2srgb");
+    m->add(chaiscript::fun(&linde::convert_lab2srgb), "convert_lab2srgb");
+    m->add(chaiscript::fun(&linde::convert_srgb2lab), "convert_srgb2lab");
+    m->add(chaiscript::fun(&linde::convert_lab2rgb), "convert_lab2rgb");
+    m->add(chaiscript::fun(&linde::convert_rgb2lab), "convert_rgb2lab");
+    m->add(chaiscript::fun(&linde::convert_xyz2srgb), "convert_xyz2srgb");
+    m->add(chaiscript::fun(&linde::convert_hsv2srgb), "convert_hsv2srgb");
+    m->add(chaiscript::fun(&linde::convert_srgb2hsv), "convert_srgb2hsv");
+    m->add(chaiscript::fun(&linde::convert_srgb2xyz), "convert_srgb2xyz");
+    m->add(chaiscript::fun(&linde::convert_xyz2xyY), "convert_xyz2xyY");
+    m->add(chaiscript::fun(&linde::convert_xyY2xyz), "convert_xyY2xyz");
+    m->add(chaiscript::fun(&linde::convert_Luv2XYZ), "convert_Luv2XYZ");
+    m->add(chaiscript::fun(&linde::convert_XYZ2Luv), "convert_XYZ2Luv");
+    m->add(chaiscript::fun(&linde::convert_Luv2LCHuv), "convert_Luv2LCHuv");
+    m->add(chaiscript::fun(&linde::convert_LCHuv2Luv), "convert_LCHuv2Luv");
+    m->add(chaiscript::fun(&linde::convert_Yuv2rgb), "convert_Yuv2rgb");
+    m->add(chaiscript::fun(&linde::convert_rgb2Yuv), "convert_rgb2Yuv");
+    m->add(chaiscript::fun(&linde::convert_rgb2L_alpha_beta), "convert_rgb2L_alpha_beta");
+    m->add(chaiscript::fun(&linde::convert_L_alpha_beta2rgb), "convert_L_alpha_beta2rgb");
+
+    chai.add(m);
+}
+
 
 void addLindeLibFunctions(chaiscript::ChaiScript &chai)
 {
     addImageTypes(chai);
     addImageIO(chai);
+    addImageProc(chai);
+    addColorFunctions(chai);
 }

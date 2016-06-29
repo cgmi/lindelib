@@ -1,5 +1,7 @@
-var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/Philip_Tina/Philip_Tina.jpg");
+var r = vec3(0.25f, 0.25f, 0.25f);
+var a = vec3();
+convert_rgb2srgb(r, a);
 
-m.at(10, 10) = vec3(1.0f, 0.0f, 0.0f) + vec3(0.0f, 0.0f, 1.0f);
+print(a);
 
-imshow("input", m, 0);
+
