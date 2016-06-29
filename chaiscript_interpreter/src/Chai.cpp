@@ -39,7 +39,45 @@ cv::Mat_<T> ComputeGaussDerivativeEnergy(const cv::Mat_<T> & source,
     return out;
 }
 
-void addLindeLibFunctions(chaiscript::ChaiScript &chai)
+cv::Mat_<glm::vec3> createMat3(int rows, int cols, const glm::vec3 & v)
+{
+    cv::Mat_<glm::vec3> m(rows, cols);
+    m.setTo(cv::Scalar(v.x, v.y, v.z));
+    return m;
+}
+
+cv::Mat_<float> createMat1(int rows, int cols, const float & v)
+{
+    cv::Mat_<float> m(rows, cols);
+    m.setTo(v);
+    return m;
+}
+
+cv::Mat_<glm::vec3> createMat3_vec_value(const glm::ivec2 & dim, const glm::vec3 & v)
+{
+    cv::Mat_<glm::vec3> m(dim.y, dim.x);
+    m.setTo(cv::Scalar(v.x, v.y, v.z));
+    return m;
+}
+
+cv::Mat_<float> createMat1_vec_value(const glm::ivec2 & dim, const float & v)
+{
+    cv::Mat_<float> m(dim.y, dim.x);
+    m.setTo(v);
+    return m;
+}
+
+cv::Mat_<glm::vec3> createMat3_vec(const glm::ivec2 & dim)
+{
+    return cv::Mat_<glm::vec3>(dim.y, dim.x);
+}
+
+cv::Mat_<float> createMat1_vec(const glm::ivec2 & dim)
+{
+    return cv::Mat_<float>(dim.y, dim.x);
+}
+
+void addVectorTypes(chaiscript::ChaiScript &chai)
 {
     chaiscript::ModulePtr m(new chaiscript::Module());
 
@@ -79,46 +117,63 @@ void addLindeLibFunctions(chaiscript::ChaiScript &chai)
         { chaiscript::fun(&glm::ivec2::y), "y" }
     });
 
-    // image types
-    chaiscript::utility::add_class<cv::Mat_<glm::vec3>>(*m,
-                                   "Mat3f",
-    {
-        chaiscript::constructor<cv::Mat_<glm::vec3>()>(),
-        chaiscript::constructor<cv::Mat_<glm::vec3>(int, int)>()
-    },
-    {
-        { chaiscript::fun(&cv::Mat_<glm::vec3>::rows), "rows" },
-        { chaiscript::fun(&cv::Mat_<glm::vec3>::cols), "cols" },
-       // { chaiscript::fun<const glm::vec3&, int, int>(&cv::Mat_<glm::vec3>::at), "at" }
+    chai.add(m);
+}
 
-    });
-    chaiscript::utility::add_class<cv::Mat_<float>>(*m,
-                                   "Mat1f",
-    {
-        chaiscript::constructor<cv::Mat_<float>()>(),
-        chaiscript::constructor<cv::Mat_<float>(int, int)>()
-    },
-    {
-        { chaiscript::fun(&cv::Mat_<float>::rows), "rows" },
-        { chaiscript::fun(&cv::Mat_<float>::cols), "cols" },
-       // { chaiscript::fun<const glm::vec3&, int, int>(&cv::Mat_<glm::vec3>::at), "at" }
+void addImageTypes(chaiscript::ChaiScript &chai)
+{
+    chaiscript::ModulePtr m(new chaiscript::Module());
 
-    });
+    m->add(chaiscript::base_class<cv::Mat, cv::Mat_<glm::vec3> >());
+    m->add(chaiscript::base_class<cv::Mat, cv::Mat_<float> >());
+
+    m->add(chaiscript::fun(&cv::Mat::rows), "rows");
+    m->add(chaiscript::fun(&cv::Mat::cols), "cols");
+    m->add(chaiscript::fun(&cv::Mat::empty), "empty");
+    m->add(chaiscript::fun(&cv::Mat::total), "total");
+    m->add(chaiscript::constructor<cv::Mat_<glm::vec3>()>(), "Mat3");
+    m->add(chaiscript::constructor<cv::Mat_<float>()>(), "Mat1");
+    m->add(chaiscript::constructor<cv::Mat_<glm::vec3>(int, int)>(), "Mat3");
+    m->add(chaiscript::constructor<cv::Mat_<float>(int, int)>(), "Mat1");
+    m->add(chaiscript::fun(&createMat3), "Mat3");
+    m->add(chaiscript::fun(&createMat1), "Mat1");
+    m->add(chaiscript::fun(&createMat3_vec), "Mat3");
+    m->add(chaiscript::fun(&createMat1_vec), "Mat1");
+    m->add(chaiscript::fun(&createMat3_vec_value), "Mat3");
+    m->add(chaiscript::fun(&createMat1_vec_value), "Mat1");
+
+   // m->add(chaiscript::fun(&cv::Mat::at), "at");
 
     chai.add(m);
 
-    // image load and save
-    chai.add(chaiscript::fun<cv::Mat_<glm::vec3>, const std::string&>(&linde::imLoad), "imload");
-    chai.add(chaiscript::fun<cv::Mat_<float>, const std::string&>(&linde::imLoadSingleChannel), "imload_single_channel");
 
-    chai.add(chaiscript::fun<bool, const std::string&, const cv::Mat_<glm::vec3>&>(&linde::imSave), "imsave");
-    chai.add(chaiscript::fun<bool, const std::string&, const cv::Mat_<float>&>(&linde::imSave), "imsave");
+}
 
-    // imgproc
-    chai.add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float>(&gaussian_blur), "gaussian_blur");
-    chai.add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float, int>(&ComputeGaussDerivativeEnergy), "gaussian_derivative_energy");
+void addImageIO(chaiscript::ChaiScript &chai)
+{
+     chaiscript::ModulePtr m(new chaiscript::Module());
 
-    // image show
-    chai.add(chaiscript::fun<void, const std::string&, const cv::Mat_<glm::vec3>&, int>(&imShow), "imshow");
-    chai.add(chaiscript::fun<void, const std::string&, const cv::Mat_<float>&, int>(&imShow), "imshow");
+     // image load and save
+     m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const std::string&>(&linde::imLoad), "imload");
+     m->add(chaiscript::fun<cv::Mat_<float>, const std::string&>(&linde::imLoadSingleChannel), "imload_single_channel");
+
+     m->add(chaiscript::fun<bool, const std::string&, const cv::Mat_<glm::vec3>&>(&linde::imSave), "imsave");
+     m->add(chaiscript::fun<bool, const std::string&, const cv::Mat_<float>&>(&linde::imSave), "imsave");
+
+     // imgproc
+     m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float>(&gaussian_blur), "gaussian_blur");
+     m->add(chaiscript::fun<cv::Mat_<glm::vec3>, const cv::Mat_<glm::vec3>&, float, int>(&ComputeGaussDerivativeEnergy), "gaussian_derivative_energy");
+
+     // image show
+     m->add(chaiscript::fun<void, const std::string&, const cv::Mat_<glm::vec3>&, int>(&imShow), "imshow");
+     m->add(chaiscript::fun<void, const std::string&, const cv::Mat_<float>&, int>(&imShow), "imshow");
+
+     chai.add(m);
+}
+
+void addLindeLibFunctions(chaiscript::ChaiScript &chai)
+{
+    addVectorTypes(chai);
+    addImageTypes(chai);
+    addImageIO(chai);
 }
