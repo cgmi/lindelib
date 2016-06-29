@@ -198,10 +198,34 @@ cv::Mat mat_mul_helper(const cv::Mat & a, const cv::Mat & b)
     return cv::operator*(a, b);
 }
 
+std::vector<chaiscript::Boxed_Value> extractChannels(const cv::Mat_<glm::vec3> & source)
+{
+    std::vector<cv::Mat_<float> > split;
+    cv::split(source, split);
+    std::vector<chaiscript::Boxed_Value> boxed;
+    boxed.push_back(chaiscript::Boxed_Value(split[0]));
+    boxed.push_back(chaiscript::Boxed_Value(split[1]));
+    boxed.push_back(chaiscript::Boxed_Value(split[2]));
+    return boxed;
+}
+
+cv::Mat_<glm::vec3> mergeChannels(const std::vector<chaiscript::Boxed_Value>  & source)
+{
+    std::vector<cv::Mat_<float> > split;
+    for (auto b : source)
+    {
+        split.push_back(chaiscript::boxed_cast<cv::Mat_<float> >(b));
+    }
+    cv::Mat_<glm::vec3> merged;
+    cv::merge(split, merged);
+    return merged;
+}
 
 void addVectorTypes(chaiscript::ChaiScript &chai)
 {
     chaiscript::ModulePtr m(new chaiscript::Module());
+
+    m->add_global_const(chaiscript::const_var(linde::PI<float>()), "PI");
 
     // vector types
     chaiscript::utility::add_class<glm::vec3>(*m,
@@ -365,6 +389,9 @@ void addImageTypes(chaiscript::ChaiScript &chai)
     m->add(chaiscript::fun<const glm::vec3&, cv::Mat_<glm::vec3>, int, int>(&cv::Mat_<glm::vec3>::operator()), "at");
     m->add(chaiscript::fun<const float&, cv::Mat_<float>, int>(&cv::Mat_<float>::operator()), "at");
     m->add(chaiscript::fun<const glm::vec3&, cv::Mat_<glm::vec3>, int>(&cv::Mat_<glm::vec3>::operator()), "at");
+
+    m->add(chaiscript::fun(&extractChannels), "split");
+    m->add(chaiscript::fun(&mergeChannels), "merge");
 
     chai.add(m);
 }

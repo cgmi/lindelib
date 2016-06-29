@@ -1,11 +1,16 @@
 var m = imload("/media/merkur57shares/cgmi/resources/LayerPainterTemplates/car_0/car_0.jpg");
+// color conversion
+m = convert_color(m, convert_srgb2lab);
+m = convert_color(m, convert_lab2LCHab);
 
-for (var i = 0; i < m.rows; ++i)
-{
-	for (var j = 0; j < m.cols; ++j)
-	{
-  		m.at(i, j).x += 0.3f;
-	}
-}
+var channels = split(m);
 
-imshow("input", m, 0);
+// filtering
+var sigma = 15.0f;
+var gaborKernel = createGaborKernel(ivec2(100,100), sigma, 0.0f, 1.6f*sigma, 1.0f, 0.0f);
+channels[0] = convolve(channels[0], gaborKernel);
+
+channels[2] = normalize(channels[2], 0.0f, PI, 0.0f, 1.0f);
+
+imshow("kernel", gaborKernel, 1);
+imshow("filtered", channels[2], 0);
