@@ -67,7 +67,7 @@ Texture::Texture(GLContext * glContext,
 void Texture::update(GLsizei width, GLsizei height,
     GLint internalFormat, GLenum format, GLint type,
     GLint minFilter, GLint magFilter,
-    GLint envMode, GLfloat wrapMode)
+    GLint envMode, GLint wrapMode)
 {
     m_width = width;
     m_height = height;
@@ -106,16 +106,16 @@ void Texture::upload(void * data)
         glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
     }
     glTexImage2D(m_target, m_mipLevel, m_internalFormat, m_width, m_height, m_border, m_format, m_type, data);
-
+	glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, m_minFilter);
     glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, m_magFilter);
 
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_envMode);
 
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_S, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_T, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_R, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_S, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_T, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_R, m_wrap);
 
     glTexParameterf(m_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
 
@@ -133,16 +133,16 @@ void Texture::create(void * data)
         glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
     }
     glTexImage2D(m_target, m_mipLevel, m_internalFormat, m_width, m_height, m_border, m_format, m_type, data);
-
+	glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, m_minFilter);
     glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, m_magFilter);
 
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, m_envMode);
 
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_S, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_T, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_R, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_S, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_T, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_R, m_wrap);
 
     glTexParameterf(m_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, m_maxAnisotropy);
 
@@ -209,7 +209,7 @@ GLint Texture::getMagFilter() const
     return m_magFilter;
 }
 
-GLfloat Texture::getWrap() const
+GLint Texture::getWrap() const
 {
     return m_wrap;
 }
@@ -224,15 +224,15 @@ GLenum Texture::getTarget() const
     return m_target;
 }
 
-void Texture::setWrapMode(GLfloat wrap)
+void Texture::setWrapMode(GLint wrap)
 {
     m_wrap = wrap;
     
     bind();
 
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_S, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_T, m_wrap);
-    glTexParameterf(m_target, GL_TEXTURE_WRAP_R, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_S, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_T, m_wrap);
+    glTexParameteri(m_target, GL_TEXTURE_WRAP_R, m_wrap);
 
 	unbind();
 }

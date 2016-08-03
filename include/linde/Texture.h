@@ -28,9 +28,9 @@ public:
     void update(GLsizei width, GLsizei height,
                 GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
                 GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                GLint envMode = GL_REPLACE, GLfloat wrapMode = GL_REPEAT);
+                GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
 
-    void setWrapMode(GLfloat wrap);
+    void setWrapMode(GLint wrap);
     void setEnvMode(GLint envMode);
     void setFilter(GLint minFilter, GLint magFilter);
     void setMaxIsotropy(GLfloat anisotropy);
@@ -57,7 +57,7 @@ public:
 
     GLint getMagFilter() const;
 
-    GLfloat getWrap() const;
+    GLint getWrap() const;
 
     GLint getEnvMode() const;
 
@@ -75,7 +75,7 @@ private:
     GLenum  m_type;
     GLint   m_minFilter;
     GLint   m_magFilter;
-    GLfloat m_wrap;
+	GLint m_wrap;
     GLint   m_envMode;
     GLboolean m_createMipMaps;
     GLfloat m_maxAnisotropy;
