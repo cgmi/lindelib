@@ -16,7 +16,7 @@ public:
     Texture(GLContext *glContext, GLsizei width, GLsizei height,
             GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
             GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-            GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+            GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     ~Texture();
 
     void bind();
@@ -28,7 +28,7 @@ public:
     void update(GLsizei width, GLsizei height,
                 GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
                 GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
 
     void setWrapMode(GLint wrap);
     void setEnvMode(GLint envMode);
@@ -64,24 +64,22 @@ public:
     GLenum getTarget() const;
 
 private:
-    GLuint  m_id;
-    GLsizei m_width;
-    GLsizei m_height;
-    GLenum  m_target;
-    GLint   m_mipLevel;
-    GLint   m_internalFormat;
-    GLenum  m_format;
-    GLint   m_border;
-    GLenum  m_type;
-    GLint   m_minFilter;
-    GLint   m_magFilter;
-	GLint m_wrap;
-    GLint   m_envMode;
-    GLboolean m_createMipMaps;
-    GLfloat m_maxAnisotropy;
-    GLboolean m_manualMipMaps;
-
-    GLboolean m_created;
+    GLuint		m_id;
+    GLsizei		m_width;
+    GLsizei		m_height;
+    GLenum		m_target;
+    GLint		m_mipLevel;
+    GLint		m_internalFormat;
+    GLenum		m_format;
+    GLint		m_border;
+    GLenum		m_type;
+    GLint		m_minFilter;
+    GLint		m_magFilter;
+	GLint		m_wrap;
+    GLint		m_envMode;
+    GLboolean	m_createMipMaps;
+    GLfloat		m_maxAnisotropy;
+    GLboolean	m_created;
 };
 
 }// namespace linde

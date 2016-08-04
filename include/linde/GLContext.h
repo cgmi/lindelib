@@ -71,19 +71,19 @@ public:
     std::shared_ptr<Texture>						createTexture(GLsizei width, GLsizei height,
                                                                   GLint internalFormat = GL_RGB32F, GLenum format = GL_RGB, GLint type = GL_FLOAT,
                                                                   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     std::shared_ptr<Texture>						createTexture(const cv::Mat_<glm::vec3> & source,
                                                                   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     std::shared_ptr<Texture>						createTexture(const cv::Mat_<glm::vec4> & source,
                                                                   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     std::shared_ptr<Texture>						createTexture(const cv::Mat_<float> & source,
                                                                   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     std::shared_ptr<Texture>						createTexture(const cv::Mat_<uchar> & source,
                                                                   GLint minFilter = GL_LINEAR, GLint magFilter = GL_LINEAR,
-                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT);
+                                                                  GLint envMode = GL_REPLACE, GLint wrapMode = GL_REPEAT, GLboolean createMipMaps = GL_FALSE);
     std::shared_ptr<TextureMultisample>				createTextureMultisample(GLsizei width, GLsizei height, GLsizei samples,
                                                                              GLenum internalFormat = GL_RGBA, GLboolean fixedSampleLocation = GL_FALSE);
 

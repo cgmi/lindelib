@@ -30,7 +30,6 @@ Texture::Texture(GLContext *glContext) :
     m_envMode(GL_REPLACE),
     m_createMipMaps(GL_FALSE),
     m_maxAnisotropy(16.0f),
-	m_manualMipMaps(GL_FALSE),
 	m_created(GL_FALSE)
 {
 
@@ -41,7 +40,7 @@ Texture::Texture(GLContext * glContext,
                  GLsizei width, GLsizei height,
     GLint internalFormat, GLenum format, GLint type,
     GLint minFilter, GLint magFilter,
-    GLint envMode, GLint wrapMode) :
+    GLint envMode, GLint wrapMode, GLboolean createMipMaps) :
     GLObject(glContext),
     m_id(0),
     m_width(width),
@@ -56,9 +55,8 @@ Texture::Texture(GLContext * glContext,
     m_magFilter(magFilter),
     m_wrap(wrapMode),
     m_envMode(envMode),
-    m_createMipMaps(GL_FALSE),
+    m_createMipMaps(createMipMaps),
     m_maxAnisotropy(1.0f),
-    m_manualMipMaps(GL_FALSE),
 	m_created(GL_FALSE)
 {
 
@@ -67,7 +65,7 @@ Texture::Texture(GLContext * glContext,
 void Texture::update(GLsizei width, GLsizei height,
     GLint internalFormat, GLenum format, GLint type,
     GLint minFilter, GLint magFilter,
-    GLint envMode, GLint wrapMode)
+    GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
     m_width = width;
     m_height = height;
@@ -78,13 +76,13 @@ void Texture::update(GLsizei width, GLsizei height,
     m_magFilter = magFilter;
     m_envMode = envMode;
     m_wrap = wrapMode;
+	m_createMipMaps = createMipMaps;
 }
 
 Texture::~Texture()
 {
     deleteTex();
 }
-
 
 void Texture::upload(void * data)
 {
@@ -101,12 +99,13 @@ void Texture::upload(void * data)
 
     bind();
 
-    if (m_createMipMaps)
-    {
-        glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
-    }
     glTexImage2D(m_target, m_mipLevel, m_internalFormat, m_width, m_height, m_border, m_format, m_type, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
+
+	if (m_createMipMaps)
+	{
+		glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 
     glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, m_minFilter);
     glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, m_magFilter);
@@ -122,18 +121,18 @@ void Texture::upload(void * data)
 	unbind();
 }
 
-
 void Texture::create(void * data)
 {
     glGenTextures(1, &m_id);
     glBindTexture(m_target, m_id);
 
+    glTexImage2D(m_target, m_mipLevel, m_internalFormat, m_width, m_height, m_border, m_format, m_type, data);
     if (m_createMipMaps)
+
     {
         glTexParameteri(m_target, GL_GENERATE_MIPMAP, GL_TRUE);
+		glGenerateMipmap(GL_TEXTURE_2D);
     }
-    glTexImage2D(m_target, m_mipLevel, m_internalFormat, m_width, m_height, m_border, m_format, m_type, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, m_minFilter);
     glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, m_magFilter);
@@ -159,12 +158,10 @@ void Texture::bindLocationUnit(GLuint unit, GLenum access, GLint level, GLboolea
     glBindImageTexture(unit, m_id, level, layered, layer, access, m_internalFormat);
 }
 
-
 void Texture::unbind()
 {
     glBindTexture(m_target, 0);
 }
-
 
 void Texture::deleteTex()
 {
@@ -271,7 +268,6 @@ void Texture::setMaxIsotropy(GLfloat anisotropy)
 
 	unbind();
 }
-
 
 void Texture::render(GLfloat posX, GLfloat posY, GLfloat width, GLfloat height)
 {

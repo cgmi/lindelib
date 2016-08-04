@@ -166,16 +166,16 @@ void GLContext::renderText(const std::string & text, const glm::vec2 & pos, cons
     m_textRenderer->render(text, pos);
 }
 
-std::shared_ptr<Texture> GLContext::createTexture(GLsizei width, GLsizei height, GLint internalFormat, GLenum format, GLint type, GLint minFilter, GLint magFilter, GLint envMode, GLint wrapMode)
+std::shared_ptr<Texture> GLContext::createTexture(GLsizei width, GLsizei height, GLint internalFormat, GLenum format, GLint type, GLint minFilter, GLint magFilter, GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
-    return std::make_shared<Texture>(this, width, height, internalFormat, format, type, minFilter, magFilter, envMode, wrapMode);
+    return std::make_shared<Texture>(this, width, height, internalFormat, format, type, minFilter, magFilter, envMode, wrapMode, createMipMaps);
 }
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec3> & source,
                                                   GLint minFilter, GLint magFilter,
-                                                  GLint envMode, GLint wrapMode)
+                                                  GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGB32F, GL_RGB, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGB32F, GL_RGB, GL_FLOAT, minFilter, magFilter, envMode, wrapMode, createMipMaps);
     cv::Mat_<glm::vec3> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -185,9 +185,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec3> & so
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec4> & source,
                                                   GLint minFilter, GLint magFilter,
-                                                  GLint envMode, GLint wrapMode)
+                                                  GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_RGBA32F, GL_RGBA, GL_FLOAT, minFilter, magFilter, envMode, wrapMode, createMipMaps);
     cv::Mat_<glm::vec4> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -197,9 +197,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<glm::vec4> & so
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<float> & source,
                                                   GLint minFilter, GLint magFilter,
-                                                  GLint envMode, GLint wrapMode)
+                                                  GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE32F_ARB, GL_RED, GL_FLOAT, minFilter, magFilter, envMode, wrapMode);
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE32F_ARB, GL_RED, GL_FLOAT, minFilter, magFilter, envMode, wrapMode, createMipMaps);
     cv::Mat_<float> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
@@ -209,9 +209,9 @@ std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<float> & source
 
 std::shared_ptr<Texture> GLContext::createTexture(const cv::Mat_<uchar> & source,
                                                   GLint minFilter, GLint magFilter,
-                                                  GLint envMode, GLint wrapMode)
+                                                  GLint envMode, GLint wrapMode, GLboolean createMipMaps)
 {
-    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE8, GL_RED, GL_UNSIGNED_BYTE, minFilter, magFilter, envMode, wrapMode);
+    std::shared_ptr<Texture> tex = std::make_shared<Texture>(this, source.cols, source.rows, GL_LUMINANCE8, GL_RED, GL_UNSIGNED_BYTE, minFilter, magFilter, envMode, wrapMode, createMipMaps);
     cv::Mat_<uchar> flipped;
     cv::flip(source, flipped, 0);
     tex->create(flipped.data);
