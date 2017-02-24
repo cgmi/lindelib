@@ -25,6 +25,7 @@ class ComputeShader;
 class Texture;
 class TextureMultisample;
 class VertexBufferObject;
+class VertexArray;
 class FrameBufferObject;
 class FrameBufferObjectMultisample;
 class ShaderStorageBufferObject;
@@ -92,6 +93,8 @@ public:
     std::shared_ptr<ComputeShader>                  createComputeShader(const std::string &source);
 
     std::shared_ptr<VertexBufferObject>				createVertexBufferObject();
+    std::shared_ptr<VertexArray>                    createVertexArray(const int elementCount);
+
     std::shared_ptr<FrameBufferObject>				createFramebufferObject();
     std::shared_ptr<FrameBufferObjectMultisample>   createFramebufferObjectMultisample();
     std::shared_ptr<ShaderStorageBufferObject>		createShaderStoragebufferObject();

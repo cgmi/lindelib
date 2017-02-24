@@ -3,6 +3,7 @@
 #include "../include/linde/FrameBufferObject.h"
 #include "../include/linde/FrameBufferObjectMultisample.h"
 #include "../include/linde/VertexBufferObject.h"
+#include "../include/linde/VertexArray.h"
 #include "../include/linde/Shader.h"
 #include "../include/linde/Texture.h"
 #include "../include//linde/TextureMultisample.h"
@@ -242,6 +243,11 @@ std::shared_ptr<ComputeShader> GLContext::createComputeShader(const std::string 
 std::shared_ptr<VertexBufferObject> GLContext::createVertexBufferObject()
 {
     return std::make_shared<VertexBufferObject>(this);
+}
+
+std::shared_ptr<VertexArray> GLContext::createVertexArray(const int elementCount)
+{
+    return std::make_shared<VertexArray>(this, elementCount);
 }
 
 std::shared_ptr<FrameBufferObject> GLContext::createFramebufferObject()
