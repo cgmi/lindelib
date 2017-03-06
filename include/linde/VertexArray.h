@@ -47,19 +47,19 @@ class VertexArray : public GLObject
 
 public:
 
-    VertexArray(GLContext *glContext, const int elementCount);
+    VertexArray(GLContext *glContext);
     ~VertexArray();
 
     GLuint createVertexBuffer(const GLuint dataSize, const size_t typeSize, const void* data, const GLenum usage);
+    void deleteVertexBuffer(const GLuint buffer);
     void addAttrib(const GLuint buffer, const GLenum type, const GLint components, GLuint divisor = 0);
     void finishAttribs(const GLboolean normalize = GL_FALSE);
-    void render(GLenum mode);
-    void renderInstanced(GLenum mode, GLsizei primcount);
+    void render(GLenum mode, GLsizei count);
+    void renderInstanced(GLenum mode, GLsizei count, GLsizei primcount);
 
 private:
 
     GLuint                                      m_vao_id;
-    GLuint                                      m_elementCount;
     std::map<GLuint, std::vector<AttribData> >  m_vertexBufferAttribs;
 };
 

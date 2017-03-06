@@ -245,9 +245,9 @@ std::shared_ptr<VertexBufferObject> GLContext::createVertexBufferObject()
     return std::make_shared<VertexBufferObject>(this);
 }
 
-std::shared_ptr<VertexArray> GLContext::createVertexArray(const int elementCount)
+std::shared_ptr<VertexArray> GLContext::createVertexArray()
 {
-    return std::make_shared<VertexArray>(this, elementCount);
+    return std::make_shared<VertexArray>(this);
 }
 
 std::shared_ptr<FrameBufferObject> GLContext::createFramebufferObject()

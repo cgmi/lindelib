@@ -3,9 +3,8 @@
 namespace linde
 {
 
-VertexArray::VertexArray(GLContext *glContext, const int elementCount) :
-    GLObject(glContext),
-    m_elementCount(elementCount)
+VertexArray::VertexArray(GLContext *glContext) :
+    GLObject(glContext)
 {
     glGenVertexArrays(1, &m_vao_id);
 }
@@ -32,6 +31,12 @@ GLuint VertexArray::createVertexBuffer(const GLuint dataSize, const size_t typeS
     m_vertexBufferAttribs.insert(std::pair<uint, std::vector<AttribData> >(vertexBuffer, std::vector<AttribData>()));
 
     return vertexBuffer;
+}
+
+void VertexArray::deleteVertexBuffer(const GLuint buffer)
+{
+    glDeleteBuffers(1, &buffer);
+    m_vertexBufferAttribs.erase(buffer);
 }
 
 void VertexArray::addAttrib(const GLuint buffer, const GLenum type, const GLint components,  GLuint divisor)
@@ -88,11 +93,8 @@ void VertexArray::finishAttribs(const GLboolean normalize)
             const AttribData &attrib = attribs[a];
             glEnableVertexAttribArray(vertexAttribArrayID);
             glVertexAttribPointer(vertexAttribArrayID, attrib.attribNumComponents, attrib.attribType, normalize, stride, (GLvoid*)offset);
+            glVertexAttribDivisor(vertexAttribArrayID, attrib.divisor);
 
-            if(attrib.divisor != 0)
-            {
-                glVertexAttribDivisor(vertexAttribArrayID, attrib.divisor);
-            }
 
             switch (attrib.attribType) {
             case GL_UNSIGNED_INT:
@@ -120,20 +122,20 @@ void VertexArray::finishAttribs(const GLboolean normalize)
     glBindVertexArray(0);
 }
 
-void VertexArray::render(GLenum mode)
+void VertexArray::render(GLenum mode, GLsizei count)
 {
     glBindVertexArray(m_vao_id);
 
-    glDrawArrays(mode, 0, m_elementCount);
+    glDrawArrays(mode, 0, count);
 
     glBindVertexArray(0);
 }
 
-void VertexArray::renderInstanced(GLenum mode, GLsizei primcount)
+void VertexArray::renderInstanced(GLenum mode, GLsizei count, GLsizei primcount)
 {
     glBindVertexArray(m_vao_id);
 
-    glDrawArraysInstanced(mode, 0, m_elementCount, primcount);
+    glDrawArraysInstanced(mode, 0, count, primcount);
 
     glBindVertexArray(0);
 }
