@@ -111,6 +111,11 @@ void AbstractShader::set2f(const GLchar* label, float arg1, float arg2)
     glUniform2f(glGetUniformLocation(m_progHandle, label), arg1, arg2);
 }
 
+void AbstractShader::set2f(const GLchar* label, const glm::vec2 &v)
+{
+    glUniform2f(glGetUniformLocation(m_progHandle, label), v[0], v[1]);
+}
+
 void AbstractShader::set3i(const GLchar* label, int arg1, int arg2, int arg3)
 {
     glUniform3i(glGetUniformLocation(m_progHandle, label), arg1, arg2, arg3);

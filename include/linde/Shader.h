@@ -50,6 +50,7 @@ public:
     void setf(const GLchar* label, float arg);
     void set2i(const GLchar* label, int arg1, int arg2);
     void set2f(const GLchar* label, float arg1, float arg2);
+    void set2f(const GLchar* label, const glm::vec2 &v);
     void set3i(const GLchar* label, int arg1, int arg2, int arg3);
     void set3f(const GLchar* label, float arg1, float arg2, float arg3);
     void set3f(const GLchar* label, const glm::vec3 &v);
