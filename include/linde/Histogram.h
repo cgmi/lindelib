@@ -78,6 +78,8 @@ uint Histogram<T>::getNrBins() const
 
 template <class T>
 Histogram<T>::Histogram() :
+    m_minValue(T()),
+    m_maxValue(T()),
     m_bins(100),
     m_isCumulative(false),
     m_isNormalized(false)

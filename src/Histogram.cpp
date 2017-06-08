@@ -3,11 +3,11 @@
 namespace linde
 {
 Histogram3D::Histogram3D() :
+    m_minValue(std::vector<float>(3, 0.f)),
+    m_maxValue(std::vector<float>(3, 1.f)),
 	m_bins(100),
 	m_isNormalized(false)
 {
-	m_minValue = std::vector<float>(3, 0.f);
-	m_maxValue = std::vector<float>(3, 1.f);
 	m_histData = std::vector<std::vector<std::vector<float> > >(m_bins, std::vector<std::vector<float>>(m_bins, std::vector<float>(m_bins, 0.f)));
 }
 
